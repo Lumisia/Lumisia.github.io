@@ -1,0 +1,178 @@
+{{ define "main" }}
+<div class="portfolio-shell"
+  data-github-user="{{ site.Params.githubUser }}"
+  data-accent="{{ site.Params.accent }}"
+  data-canvas-tone="{{ site.Params.canvasTone }}">
+  {{ partial "portfolio-sidebar.html" (dict "linkPrefix" "" "activeSection" "") }}
+
+  <div class="portfolio-main">
+    <section id="home" data-screen-label="Home">
+      <div class="hero">
+        <div class="hero-left">
+          <div class="hero-photo">
+            {{- with resources.Get "images/profile.jpg" }}
+            <img class="avatar-img" src="{{ .RelPermalink }}" alt="프로필 사진">
+            {{- end }}
+          </div>
+          <p class="hero-loc">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            Incheon, KR
+          </p>
+          <div class="hero-socials">
+            <a class="icon-btn" href="{{ site.Params.githubURL }}" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"></path></svg>
+            </a>
+            <a class="icon-btn" href="{{ site.Params.blogURL }}" target="_blank" rel="noopener" aria-label="Blog" title="Blog">B</a>
+            <a class="icon-btn" href="mailto:{{ site.Params.email }}" aria-label="Email" title="Email">@</a>
+          </div>
+        </div>
+        <div class="hero-right">
+          <h2 class="hero-name">{{ site.Params.label.text }}</h2>
+          <p class="hero-role-main">Backend Developer</p>
+          <p class="hero-stack">Spring Boot · Kubernetes · Websocket · Redis</p>
+          <div class="hero-tags">
+            <span class="hero-tag">성능을 고려하는 개발자</span>
+            <span class="hero-tag">이벤트 기반 아키텍처 설계</span>
+            <span class="hero-tag">기록하고 공유하는 개발자</span>
+          </div>
+          <p class="hero-bio">새로운 기술들을 직접 부딪히며 빠르게 익히고, 블로그를 통해 깊이를 더합니다. 계층과 서비스 구조를 항상 생각하며 코드를 작성하고, <b>"이 구조와 코드가 정말 최선인가"</b>를 끊임없이 고민하는 개발자 입니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" data-screen-label="Skills">
+      <div class="sec-head"><h2 class="sec-title">Skills · 주로 다루는 기술 스택</h2></div>
+      <div class="reveal">
+        <div class="stack-grid">
+          {{- $skills := slice
+            (dict "name" "Java"            "icon" "java/java-original.svg")
+            (dict "name" "JavaScript"      "icon" "javascript/javascript-original.svg")
+            (dict "name" "Vue.js"          "icon" "vuejs/vuejs-original.svg")
+            (dict "name" "Spring Boot"     "icon" "spring/spring-original.svg")
+            (dict "name" "Spring Data JPA" "icon" "spring/spring-original.svg")
+            (dict "name" "Kafka"           "icon" "apachekafka/apachekafka-original.svg")
+            (dict "name" "Redis"           "icon" "redis/redis-original.svg")
+            (dict "name" "Valkey"          "badge" "VK" "badgeClass" "ib-valkey")
+            (dict "name" "MariaDB"         "icon" "mariadb/mariadb-original.svg")
+            (dict "name" "Kubernetes"      "icon" "kubernetes/kubernetes-plain.svg")
+            (dict "name" "Docker"          "icon" "docker/docker-original.svg")
+            (dict "name" "AWS EC2"         "icon" "amazonwebservices/amazonwebservices-plain-wordmark.svg")
+            (dict "name" "nGrinder"        "badge" "nG" "badgeClass" "ib-ngrinder")
+            (dict "name" "Git"             "icon" "git/git-original.svg")
+          -}}
+          {{- range $skills }}
+          <span class="stack">
+            {{- if .icon }}<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/{{ .icon }}" alt="">
+            {{- else if .badge }}<span class="icon-badge {{ .badgeClass }}">{{ .badge }}</span>
+            {{- end -}}
+            {{ .name }}
+          </span>
+          {{- end }}
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" data-screen-label="Projects">
+      <div class="sec-head">
+        <h2 class="sec-title">Projects</h2>
+      </div>
+      {{- $projects := where .Site.RegularPages "Section" "projects" }}
+      {{- $pcount := len $projects }}
+      {{- $gridMod := "" }}
+      {{- if eq $pcount 1 }}{{- $gridMod = " proj-grid--1" }}{{- else if eq $pcount 2 }}{{- $gridMod = " proj-grid--2" }}{{- end }}
+      <div class="proj-grid{{ $gridMod }}">
+        {{- range $projects.ByWeight }}
+        {{- $project := . }}
+        <a class="proj-tile reveal" href="{{ .RelPermalink }}">
+          {{- with resources.Get .Params.cover.image }}
+          <img class="tile-img" src="{{ .RelPermalink }}" alt="{{ $project.Title }} 대표 이미지">
+          {{- end }}
+          <div class="tile-overlay">
+            <span class="tile-cat">{{ .Params.category }}</span>
+            <h3 class="tile-title">{{ .Title }}</h3>
+            <p class="tile-sum">{{ .Params.summary }}</p>
+            <span class="tile-btn">자세히 보기</span>
+          </div>
+        </a>
+        {{- end }}
+      </div>
+    </section>
+
+    <section id="github" data-screen-label="GitHub">
+      <div class="sec-head">
+        <h2 class="sec-title">GitHub</h2>
+      </div>
+      <div class="gh-wrap reveal">
+        <a class="gh-card" href="{{ site.Params.githubURL }}" target="_blank" rel="noopener" aria-label="GitHub 프로필 보기">
+          <img class="gh-graph" id="gh-graph" alt="GitHub 컨트리뷰션 그래프" loading="lazy">
+        </a>
+        <div class="gh-stats">
+          <div class="gh-card"><img id="gh-stats-img" alt="GitHub 활동 통계" loading="lazy"></div>
+          <div class="gh-card"><img id="gh-streak-img" alt="GitHub 연속 커밋 기록" loading="lazy"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="experience" data-screen-label="Experience">
+      <div class="sec-head"><h2 class="sec-title">Experience</h2></div>
+      <div class="tl reveal">
+        <div class="tl-item">
+          <div class="tl-header">
+            <p class="tl-title">한화시스템 BEYOND SW 캠프 24기</p>
+            <span class="tl-date">2025.12 — 2026.06</span>
+          </div>
+          <p class="tl-sub">백엔드 심화 과정 · Java · Spring Boot · MSA · Kubernetes</p>
+          <ul class="tl-points">
+            <li><b>FileinNout</b> — 파일 저장 및 협업 워크스페이스 플랫폼, Yjs Websocket + Editor.js로 실시간 협업 페이지 구성, Redis를 통해 동시성 제어</li>
+            <li><b>Callog</b> — 마케팅 협업 플랫폼, 전반적인 RESTful API 시스템 구성, Redis로 조회성능 TPS 약 12.3배 상승</li>
+            <li>Kafka · Argo Rollout · Kubernetes 기반 무중단 배포 환경 직접 구성</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="education" data-screen-label="Education">
+      <div class="sec-head"><h2 class="sec-title">Education</h2></div>
+      <div class="tl reveal">
+        <div class="tl-item">
+          <span class="tl-date">2023.03 — 2025.02</span>
+          <p class="tl-title">서울디지털대학교 컴퓨터공학과  <small>  졸업 🎓</small></p>
+        </div>
+        <div class="tl-item">
+          <span class="tl-date">2018.03 — 2022.02</span>
+          <p class="tl-title">인하공업전문대학 · 조선기계공학과  <small>  졸업 🎓</small></p>
+        </div>
+      </div>
+      <div class="cert-list reveal">
+        <div class="cert-row"><p class="cert-name">정보처리기사 🧾<small>한국산업인력공단</small></p><span class="cert-date">2025.12</span></div>
+      </div>
+    </section>
+
+    <section id="writing" data-screen-label="Writing">
+      <div class="sec-head"><h2 class="sec-title">Blog</h2></div>
+      <div class="reveal">
+        {{- range .Site.Data.posts }}
+        <a class="post" href="{{ .link }}" target="_blank" rel="noopener">
+          <span class="post-title">{{ .title }}</span>
+          <span class="post-date">{{ .date }}</span>
+        </a>
+        {{- end }}
+        <a class="more-link" href="{{ site.Params.blogURL }}" target="_blank" rel="noopener">더 보기 →</a>
+      </div>
+    </section>
+
+    <section id="contact" data-screen-label="Contact">
+      <div class="cta-block reveal">
+        <h2>함께할 팀을 찾고 있습니다</h2>
+        <p>커피챗, 채용 제안 모두 환영합니다. 편하게 연락 주세요.</p>
+        <div class="contact-row">
+          <a class="pill pill-primary" href="mailto:{{ site.Params.email }}">{{ site.Params.email }}</a>
+          <a class="pill pill-ghost" href="{{ site.Params.githubURL }}" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="portfolio-footer">© {{ now.Year }} {{ site.Params.label.text }}</footer>
+  </div>
+</div>
+{{ end }}

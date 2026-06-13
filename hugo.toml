@@ -1,0 +1,28 @@
+baseURL = "https://lumisia.github.io/"
+languageCode = "ko-kr"
+defaultContentLanguage = "ko"
+title = "최재원 | Backend Developer"
+theme = "PaperMod"
+
+[params]
+  defaultTheme = "light"
+  disableThemeToggle = true
+  githubUser = "Lumisia"
+  githubURL = "https://github.com/Lumisia"
+  blogURL = "https://lumisia.tistory.com/"
+  email = "zh2171@naver.com"
+  accent = "#a9cdec"
+  canvasTone = "pale"
+
+  [params.label]
+    text = "최재원"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+[outputs]
+  home = ["HTML"]
+  section = ["HTML"]
+  page = ["HTML"]

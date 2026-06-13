@@ -1,0 +1,28 @@
+# Hugo build output and generated cache
+/public/
+/resources/
+.hugo_build.lock
+
+# Original delivery package and local verification helpers
+/dist/
+/tests/
+
+# Local tools and editor settings
+/.claude/
+/.codex/
+/.agents/
+/.superpowers/
+/.idea/
+/.vscode/
+
+# Logs and temporary files
+*.log
+*.bak
+*.swp
+*.tmp
+*.tmp.*
+
+# Operating system metadata
+.DS_Store
+Thumbs.db
+Desktop.ini

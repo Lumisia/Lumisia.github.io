@@ -1,0 +1,2 @@
+{{- $portfolio := resources.Get "js/portfolio.js" | minify | fingerprint -}}
+<script defer src="{{ $portfolio.RelPermalink }}" integrity="{{ $portfolio.Data.Integrity }}"></script>
