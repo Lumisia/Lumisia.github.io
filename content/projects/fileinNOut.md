@@ -21,7 +21,7 @@ icon  = "jaeger"
 
 [[monitoring_links]]
 label = "Dashboard"
-url   = "https://dashboard.fileinnout.com"
+url   = "https://dashboard.fileinnout.com/#/workloads?namespace=fileinnout"
 icon  = "kubernetes"
 
 [[monitoring_links]]
