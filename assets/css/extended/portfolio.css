@@ -168,6 +168,99 @@ body > .main {
  .pill-ghost { background: var(--card); border-color: var(--blue-hair); color: var(--ink); }
  .pill-ghost:hover { border-color: var(--blue-deep); }
 
+ /* ── project links row (Live Demo + GitHub | monitoring buttons) ── */
+ .project-links-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 24px 0 0;
+ }
+ .project-links-row .project-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+ }
+
+ /* ── monitoring pill buttons ── */
+ .project-monitoring-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+ }
+ .pill-monitor {
+  background: var(--card);
+  border: 1px solid var(--blue-hair);
+  color: var(--ink-dim);
+  font-size: 15px;
+  font-weight: 480;
+  letter-spacing: -0.1px;
+  line-height: 1;
+  padding: 11px 24px;
+  gap: 8px;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 120ms ease, box-shadow 150ms ease;
+ }
+ /* CDN 이미지 아이콘 공통 */
+ .monitor-icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  display: block;
+ }
+ /* Simple Icons SVG는 기본 검정. 각 서비스 색상에 맞게 colorize */
+ .pill-monitor--jaeger   .monitor-icon { filter: invert(40%) sepia(80%) saturate(600%) hue-rotate(10deg) brightness(90%); }
+ .pill-monitor--kubernetes .monitor-icon { filter: invert(28%) sepia(80%) saturate(1200%) hue-rotate(200deg) brightness(90%); }
+ .pill-monitor--swagger  .monitor-icon { filter: invert(55%) sepia(80%) saturate(500%) hue-rotate(90deg) brightness(100%); }
+ .pill-monitor--prometheus .monitor-icon { filter: invert(38%) sepia(70%) saturate(800%) hue-rotate(350deg) brightness(90%); }
+
+ .pill-monitor:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+ }
+ .pill-monitor:active { transform: scale(0.97); }
+
+ /* Jaeger — 오렌지 계열 (#E6522C — jaeger 공식색 #006796) */
+ .pill-monitor--jaeger { border-color: #4d9fc4; color: #006796; }
+ .pill-monitor--jaeger:hover { background: #e8f4fa; border-color: #006796; color: #00506e; }
+
+ /* Dashboard (Kubernetes) — 블루 계열 #326CE5 */
+ .pill-monitor--kubernetes { border-color: #7ba4f0; color: #326CE5; }
+ .pill-monitor--kubernetes:hover { background: #eef2fd; border-color: #326CE5; color: #1f54c8; }
+
+ /* Swagger — 그린 계열 #85EA2D */
+ .pill-monitor--swagger { border-color: #85EA2D; color: #3a7e00; }
+ .pill-monitor--swagger:hover { background: #f2fde4; border-color: #5bbc00; color: #2e6200; }
+
+ /* Kiali */
+ .pill-monitor--kiali { border-color: #9d7fea; color: #6f48d4; }
+ .pill-monitor--kiali:hover { background: #f4f0fd; border-color: #6f48d4; color: #5533b3; }
+
+ /* Prometheus — 레드/오렌지 계열 #E6522C */
+ .pill-monitor--prometheus { border-color: #E6522C; color: #c0401e; }
+ .pill-monitor--prometheus:hover { background: #fdf2ee; border-color: #c0401e; color: #9e3014; }
+
+ /* 다크 모드 */
+ html[data-theme="dark"] .pill-monitor { background: var(--card); color: var(--ink-dim); }
+ /* 다크 모드에서 Simple Icons 흰색 SVG는 filter 없이도 잘 보임 */
+ html[data-theme="dark"] .pill-monitor--jaeger   .monitor-icon { filter: invert(0.9) hue-rotate(180deg) brightness(1.2); }
+ html[data-theme="dark"] .pill-monitor--kubernetes .monitor-icon { filter: brightness(2) saturate(0.8); }
+ html[data-theme="dark"] .pill-monitor--swagger  .monitor-icon { filter: brightness(1.5) saturate(1.2); }
+ html[data-theme="dark"] .pill-monitor--prometheus .monitor-icon { filter: brightness(1.8) saturate(0.9); }
+ html[data-theme="dark"] .pill-monitor--jaeger { border-color: #2a6480; color: #5bb8e0; }
+ html[data-theme="dark"] .pill-monitor--jaeger:hover { background: rgba(0,103,150,0.15); border-color: #5bb8e0; color: #8dd4f0; }
+ html[data-theme="dark"] .pill-monitor--kubernetes { border-color: #2a4f7a; color: #7ab4e8; }
+ html[data-theme="dark"] .pill-monitor--kubernetes:hover { background: rgba(50,108,229,0.12); border-color: #7ab4e8; color: #a8d0f5; }
+ html[data-theme="dark"] .pill-monitor--swagger { border-color: #2d5c00; color: #85EA2D; }
+ html[data-theme="dark"] .pill-monitor--swagger:hover { background: rgba(133,234,45,0.10); border-color: #85EA2D; color: #a8f060; }
+ html[data-theme="dark"] .pill-monitor--kiali { border-color: #3e2675; color: #b89ef5; }
+ html[data-theme="dark"] .pill-monitor--kiali:hover { background: rgba(157,127,234,0.12); border-color: #b89ef5; color: #ccbbfc; }
+ html[data-theme="dark"] .pill-monitor--prometheus { border-color: #7a2812; color: #f08060; }
+ html[data-theme="dark"] .pill-monitor--prometheus:hover { background: rgba(230,82,44,0.12); border-color: #f08060; color: #f5a085; }
+ html[data-theme="dark"] .project-monitoring-links { border-left-color: var(--blue-hair); }
+
  /* ── hero ── */
  #home { padding-top: 24px; }
  .hero { display: flex; gap: 56px; padding: 32px 8px 8px; }
@@ -523,7 +616,27 @@ body > .main {
  display: flex;
  gap: 10px;
  flex-wrap: wrap;
- margin: 24px 0 0;
+}
+
+/* ── project info bar: single-line metadata (period · team · responsibility) ── */
+.proj-info-bar {
+ font-family: var(--font-mono);
+ font-size: 12.5px;
+ font-weight: 500;
+ color: var(--blue-deep);
+ background: var(--blue-soft);
+ border: 1px solid var(--blue-block);
+ border-radius: 12px;
+ padding: 10px 16px;
+ margin: 20px 0 16px;
+ line-height: 1.5;
+ letter-spacing: 0.1px;
+ word-break: keep-all;
+ overflow-wrap: break-word;
+}
+html[data-theme="dark"] .proj-info-bar {
+ background: var(--blue-block);
+ border-color: var(--blue-hair);
 }
 
 /* ── project page: architecture image ── */

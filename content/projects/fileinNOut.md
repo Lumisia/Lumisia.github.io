@@ -5,11 +5,39 @@ weight = 1
 slug = "fileinnout"
 category = "Collaboration · 팀 프로젝트"
 summary = "팀 프로젝트를 위한 통합 협업 플랫폼"
-description = "팀 워크스페이스 관리, 실시간 협업 문서, 역할별 권한, 초대·알림, 실시간 사용자 제어를 제공하는 협업 플랫폼입니다."
+description = "팀 워크스페이스 관리, 실시간 협업 문서, 역할별 권한, 초대·알림, 실시간 사용자 제어를 제공하는 협업 플랫폼입니다. 파일들을 저장 및 공유할 수 있으며, 워크스페이스라는 문서 작업을 하며 Notion 스타일의 블럭 에디터를 사용합니다. Yjs Websocket + Editor.js를 사용했으며 백엔드는 Redis를 통해 배포할 때도 동시성 제어를 하게끔 했습니다."
 cover = { image = "images/projects/fileinnout/FileinNout.png" }
 live_demo = "https://www.fileinnout.kro.kr/"
 repository = "https://github.com/Lumisia/FileinNOut"
 architecture_image = "images/projects/fileinnout/fileinnout.system_architecture.png"
+period = "2026.01 ~ 2026.04 (BEYOND SW 캠프 24기 3차 프로젝트)"
+team = "팀원 4명"
+responsibility = "웹소켓 및 백엔드 담당"
+
+[[monitoring_links]]
+label = "Jaeger"
+url   = "https://jaeger.fileinnout.com/search?end=1781757710987000&limit=20&lookback=1h&maxDuration&minDuration&service=jaeger-all-in-one&start=1781754110987000"
+icon  = "jaeger"
+
+[[monitoring_links]]
+label = "Dashboard"
+url   = "https://dashboard.fileinnout.com"
+icon  = "kubernetes"
+
+[[monitoring_links]]
+label = "Swagger"
+url   = "https://swagger.fileinnout.com/"
+icon  = "swagger"
+
+[[monitoring_links]]
+label = "Kiali"
+url   = "https://kiali.fileinnout.com/kiali/console/mesh?duration=300&refresh=60000&meshLayout=dagre"
+icon  = "kiali"
+
+[[monitoring_links]]
+label = "Prometheus"
+url   = "https://prometheus.fileinnout.com/targets"
+icon  = "prometheus"
 
 [[contributions]]
 title = "Backend"

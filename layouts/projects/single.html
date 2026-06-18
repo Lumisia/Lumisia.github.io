@@ -15,26 +15,53 @@
         <p class="pd-sum">{{ .Params.description }}</p>
       </header>
 
-      {{- if or .Params.live_demo .Params.repository }}
-      <div class="project-links">
-        {{- with .Params.live_demo }}
-        <a class="pill pill-primary" href="{{ . }}" target="_blank" rel="noopener">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-          Live Demo
-        </a>
-        {{- end }}
-        {{- with .Params.repository }}
-        <a class="pill pill-ghost" href="{{ . }}" target="_blank" rel="noopener">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"></path></svg>
-          GitHub
-        </a>
+      {{- if or .Params.period .Params.team .Params.responsibility }}
+      {{- $parts := slice }}
+      {{- with .Params.period }}{{- $parts = $parts | append . }}{{- end }}
+      {{- with .Params.team }}{{- $parts = $parts | append . }}{{- end }}
+      {{- with .Params.responsibility }}{{- $parts = $parts | append . }}{{- end }}
+      <p class="proj-info-bar">{{ delimit $parts " · " }}</p>
+      {{- end }}
+
+      {{- if or .Params.live_demo .Params.repository .Params.monitoring_links }}
+      <div class="project-links-row">
+        <div class="project-links">
+          {{- with .Params.live_demo }}
+          <a class="pill pill-primary" href="{{ . }}" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            Live Demo
+          </a>
+          {{- end }}
+          {{- with .Params.repository }}
+          <a class="pill pill-ghost" href="{{ . }}" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"></path></svg>
+            GitHub
+          </a>
+          {{- end }}
+        </div>
+        {{- with .Params.monitoring_links }}
+        <div class="project-monitoring-links">
+          {{- range . }}
+          <a class="pill pill-monitor pill-monitor--{{ .icon }}" href="{{ .url }}" target="_blank" rel="noopener" title="{{ .label }}">
+            {{- if eq .icon "kiali" }}
+            <img class="monitor-icon" width="15" height="15"
+              src="https://raw.githubusercontent.com/kiali/kiali/master/frontend/public/kiali_icon_lightbkg_16px.png"
+              alt="Kiali 아이콘" aria-hidden="true">
+            {{- else }}
+            <img class="monitor-icon monitor-icon--simpleicons" width="15" height="15"
+              src="https://cdn.simpleicons.org/{{ .icon }}"
+              alt="{{ .label }} 아이콘" aria-hidden="true">
+            {{- end }}
+            {{ .label }}
+          </a>
+          {{- end }}
+        </div>
         {{- end }}
       </div>
       {{- end }}
 
-      {{- if or .Params.period .Params.role .Params.contribution }}
+      {{- if or .Params.role .Params.contribution }}
       <div class="pd-meta">
-        {{- with .Params.period }}<div><span>기간</span>{{ . }}</div>{{- end }}
         {{- with .Params.role }}<div><span>인원 · 역할</span>{{ . }}</div>{{- end }}
         {{- with .Params.contribution }}<div><span>기여도</span>{{ . }}</div>{{- end }}
       </div>
