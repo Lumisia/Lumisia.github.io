@@ -39,6 +39,11 @@ label = "Prometheus"
 url   = "https://prometheus.fileinnout.com/targets"
 icon  = "prometheus"
 
+[[monitoring_links]]
+label = "Grafana"
+url   = "https://grafana.fileinnout.com/d/rYdddlPWk/node-exporter-full?orgId=1&from=now-5m&to=now&timezone=browser&var-ds_prometheus=PBFA97CFB590B2093&var-job=kubernetes-service-endpoints&var-nodename=instance20260526051902&var-node=10.0.0.164:9100&refresh=1m"
+icon  = "grafana"
+
 [[contributions]]
 title = "Backend"
 items = [
