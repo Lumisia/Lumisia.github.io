@@ -96,6 +96,91 @@
       </section>
       {{- end }}
 
+      {{- with .Params.features }}
+      <section class="proj-detail-section proj-feature-section">
+        <h2 class="proj-sec-h">담당 영역</h2>
+        {{- with $.Params.features_intro }}
+        <div class="feature-intro">{{ . | markdownify }}</div>
+        {{- end }}
+        <div class="feature-list">
+          {{- range . }}
+          <article class="feature-block">
+            {{- with .heading }}<h3 class="proj-detail-title">{{ . }}</h3>{{- end }}
+            {{- with resources.Get .image }}
+            <img class="feature-shot" src="{{ .RelPermalink }}" alt="{{ $.Title }} 화면" loading="lazy">
+            {{- end }}
+            {{- with .body }}<div class="proj-detail-copy feature-copy">{{ . | markdownify }}</div>{{- end }}
+          </article>
+          {{- end }}
+        </div>
+      </section>
+      {{- end }}
+
+      {{/*
+        Project detail front matter:
+        [[implementation_methods]] title, description, items = []
+        [[troubleshooting]] title, problem, cause, solution, result
+      */}}
+      {{- with .Params.implementation_methods }}
+      <section class="proj-detail-section proj-implementation-section">
+        <h2 class="proj-sec-h">구현 방식</h2>
+        <div class="implementation-grid">
+          {{- range . }}
+          <article class="implementation-card">
+            {{- with .title }}<h3 class="proj-detail-title">{{ . }}</h3>{{- end }}
+            {{- with .description }}<div class="proj-detail-copy">{{ . | markdownify }}</div>{{- end }}
+            {{- with .items }}
+            <ul class="proj-points">
+              {{- range . }}
+              <li>{{ . | markdownify }}</li>
+              {{- end }}
+            </ul>
+            {{- end }}
+          </article>
+          {{- end }}
+        </div>
+      </section>
+      {{- end }}
+
+      {{- with .Params.troubleshooting }}
+      <section class="proj-detail-section proj-troubleshooting-section">
+        <h2 class="proj-sec-h">트러블 슈팅</h2>
+        <div class="troubleshooting-list">
+          {{- range . }}
+          <article class="troubleshooting-card">
+            {{- with .title }}<h3 class="proj-detail-title">{{ . }}</h3>{{- end }}
+            <div class="troubleshooting-flow">
+              {{- with .problem }}
+              <section class="troubleshooting-step">
+                <h4>문제 상황</h4>
+                <div>{{ $.RenderString . }}</div>
+              </section>
+              {{- end }}
+              {{- with .cause }}
+              <section class="troubleshooting-step">
+                <h4>원인 분석</h4>
+                <div>{{ $.RenderString . }}</div>
+              </section>
+              {{- end }}
+              {{- with .solution }}
+              <section class="troubleshooting-step troubleshooting-step--solution">
+                <h4>해결 방안</h4>
+                <div>{{ $.RenderString . }}</div>
+              </section>
+              {{- end }}
+              {{- with .result }}
+              <section class="troubleshooting-step troubleshooting-step--solution">
+                <h4>결과</h4>
+                <div>{{ $.RenderString . }}</div>
+              </section>
+              {{- end }}
+            </div>
+          </article>
+          {{- end }}
+        </div>
+      </section>
+      {{- end }}
+
       {{- with .Params.tech }}
       <section class="project-tech">
         <h2>기술 스택</h2>

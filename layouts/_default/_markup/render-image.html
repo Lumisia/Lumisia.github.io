@@ -1,0 +1,6 @@
+{{- $destination := .Destination -}}
+{{- with resources.Get $destination -}}
+<img src="{{ .RelPermalink }}" alt="{{ $.Text }}"{{ with $.Title }} title="{{ . }}"{{ end }} loading="lazy">
+{{- else -}}
+<img src="{{ $destination | safeURL }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }} loading="lazy">
+{{- end -}}

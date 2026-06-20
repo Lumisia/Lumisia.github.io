@@ -661,7 +661,8 @@ html[data-theme="dark"] .proj-info-bar {
 
 /* ── tech section in project content ── */
 .proj-tech-section,
-.proj-resp-section {
+.proj-resp-section,
+.proj-detail-section {
  margin: 36px 0;
 }
 h2.proj-sec-h {
@@ -745,6 +746,168 @@ h2.proj-sec-h {
  padding-left: 0;
 }
 
+/* ── project detail: implementation and troubleshooting ── */
+.implementation-grid {
+ display: grid;
+ grid-template-columns: repeat(2, minmax(0, 1fr));
+ gap: 14px;
+}
+.implementation-card,
+.troubleshooting-card {
+ background: var(--card);
+ border: 1px solid var(--blue-hair);
+ border-radius: 20px;
+ padding: 20px 22px;
+}
+.proj-detail-title {
+ margin: 0 0 12px;
+ font-size: 15px;
+ font-weight: 700;
+ color: var(--blue-deep);
+ line-height: 1.5;
+}
+.proj-detail-copy {
+ color: var(--ink-dim);
+ font-size: 14px;
+ line-height: 1.7;
+}
+.proj-detail-copy p,
+.troubleshooting-step p {
+ margin: 0;
+}
+.implementation-card .proj-points {
+ margin-top: 12px;
+}
+.troubleshooting-list {
+ display: flex;
+ flex-direction: column;
+ gap: 16px;
+}
+.troubleshooting-card > .proj-detail-title {
+ padding-bottom: 12px;
+ border-bottom: 1px solid var(--blue-hair);
+}
+.troubleshooting-flow {
+ display: flex;
+ flex-direction: column;
+ gap: 22px;
+}
+.troubleshooting-step {
+ min-width: 0;
+ color: var(--ink-dim);
+ font-size: 14px;
+ line-height: 1.7;
+ overflow-wrap: anywhere;
+}
+.troubleshooting-step h4 {
+ margin: 0 0 8px;
+ font-size: 15px;
+ font-weight: 700;
+ color: var(--blue-deep);
+}
+/* tables and images inside troubleshooting steps */
+.troubleshooting-step table {
+ width: 100%;
+ border-collapse: collapse;
+ margin: 12px 0 4px;
+ font-size: 13px;
+}
+.troubleshooting-step th,
+.troubleshooting-step td {
+ border: 1px solid var(--blue-hair);
+ padding: 8px 10px;
+ text-align: left;
+ vertical-align: top;
+ background: var(--card);
+}
+.troubleshooting-step th {
+ color: var(--blue-deep);
+ font-weight: 700;
+ white-space: nowrap;
+}
+.troubleshooting-step img {
+ display: block;
+ width: 100%;
+ max-width: 760px;
+ height: auto;
+ border-radius: 10px;
+ border: 1px solid var(--blue-hair);
+ margin: 12px auto;
+}
+.troubleshooting-step pre {
+ margin: 14px 0;
+ padding: 16px 18px;
+ overflow-x: auto;
+ border: 1px solid var(--blue-hair);
+ border-radius: 12px;
+ background: color-mix(in srgb, var(--ink) 92%, transparent);
+ color: var(--canvas);
+ font-family: var(--font-mono);
+ font-size: 12.5px;
+ line-height: 1.65;
+ tab-size: 2;
+}
+.troubleshooting-step pre code {
+ padding: 0;
+ border: 0;
+ background: transparent;
+ color: inherit;
+ font: inherit;
+}
+.troubleshooting-step blockquote {
+ margin: 10px 0 0;
+ padding: 2px 0 2px 12px;
+ border-left: 3px solid var(--blue-block);
+ color: var(--blue-deep);
+ font-size: 12.5px;
+}
+.troubleshooting-step ul {
+ margin: 8px 0 0;
+ padding-left: 18px;
+}
+
+/* ── 담당 영역 (feature walkthrough) ── */
+.feature-intro {
+ color: var(--ink-dim);
+ font-size: 14px;
+ line-height: 1.7;
+ margin-bottom: 20px;
+}
+.feature-list {
+ display: flex;
+ flex-direction: column;
+ gap: 22px;
+}
+.feature-block {
+ background: var(--card);
+ border: 1px solid var(--blue-hair);
+ border-radius: 20px;
+ padding: 22px 24px;
+}
+.feature-block > .proj-detail-title {
+ padding-bottom: 12px;
+ border-bottom: 1px solid var(--blue-hair);
+}
+.feature-shot {
+ display: block;
+ width: 100%;
+ height: auto;
+ border-radius: 14px;
+ border: 1px solid var(--blue-hair);
+ margin: 16px 0;
+}
+.feature-copy ul {
+ margin: 0;
+ padding-left: 18px;
+}
+.feature-copy li {
+ margin-bottom: 8px;
+ line-height: 1.7;
+}
+.feature-copy li:last-child { margin-bottom: 0; }
+.feature-copy p { margin: 0 0 10px; }
+.feature-copy p:last-child { margin-bottom: 0; }
+
 @media (hover: none) {
  .tile-overlay {
    justify-content: flex-end;
@@ -757,4 +920,6 @@ h2.proj-sec-h {
  .resp-grid { grid-template-columns: 1fr; }
  .resp-card--full { grid-column: auto; }
  .proj-tech-grid { grid-template-columns: repeat(2, 1fr); }
+ .implementation-grid,
+ .troubleshooting-flow { grid-template-columns: 1fr; }
 }

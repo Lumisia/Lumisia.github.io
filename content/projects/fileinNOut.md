@@ -7,12 +7,16 @@ category = "Collaboration · 팀 프로젝트"
 summary = "팀 프로젝트를 위한 통합 협업 플랫폼"
 description = "팀 워크스페이스 관리, 실시간 협업 문서, 역할별 권한, 초대·알림, 실시간 사용자 제어를 제공하는 협업 플랫폼입니다. 파일들을 저장 및 공유할 수 있으며, 워크스페이스라는 문서 작업을 하며 Notion 스타일의 블럭 에디터를 사용합니다. Yjs Websocket + Editor.js를 사용했으며 백엔드는 Redis를 통해 배포할 때도 동시성 제어를 하게끔 했습니다."
 cover = { image = "images/projects/fileinnout/FileinNout.png" }
-live_demo = "https://www.fileinnout.kro.kr/"
+live_demo = "https://lumisia.fileinnout.com/"
 repository = "https://github.com/Lumisia/FileinNOut"
 architecture_image = "images/projects/fileinnout/fileinnout.system_architecture.png"
 period = "2026.01 ~ 2026.04 (BEYOND SW 캠프 24기 3차 프로젝트)"
 team = "팀원 4명"
 responsibility = "웹소켓 및 백엔드 담당"
+
+features_intro = """
+제가 설계하고 구현한 **워크스페이스**는 여러 사용자가 하나의 문서를 실시간으로 함께 편집하는 협업 공간입니다. 문서 작성, 첨부파일, 버전 이력, 권한·공유 설정까지 워크스페이스의 전 영역을 담당했습니다.
+"""
 
 [[monitoring_links]]
 label = "Jaeger"
@@ -69,6 +73,201 @@ items = [
   "Redis를 이용한 SSE 동시성 제어",
   "Argo Rollouts를 통한 블루/그린 배포",
 ]
+
+[[features]]
+heading = "워크스페이스 영역"
+image = "images/projects/fileinnout/workspace-main.png"
+body = """
+- **좌측 사이드바** — 개인 페이지 / 협업 페이지로 나눠, 혼자 작업하거나 다른 사용자와 함께 협업할 수 있도록 구성했습니다.
+- **메인 페이지** — 제목과 내용을 추가하고, 파일을 올리면 우측 첨부파일 영역에 첨부됩니다.
+- **버전 이력** — 저장 버튼 우측에서 버전 이력을 조회하고, 원하는 버전으로 되돌릴 수 있습니다.
+"""
+
+[[features]]
+heading = "워크스페이스 설정"
+image = "images/projects/fileinnout/workspace-settings.png"
+body = """
+워크스페이스 우측의 설정에서 세 가지를 조절합니다.
+
+- **공유** — 개인 / 공유 / 공개 중 공유 범위를 설정합니다.
+- **권한 설정** — 공유한 사용자별로 권한을 부여합니다.
+- **삭제** — 해당 워크스페이스를 삭제합니다.
+
+권한은 관리자 / 편집자 / 뷰어로 나뉘며 역할이 다릅니다.
+
+- **관리자** — 사용자 권한 조절, 공개 설정, 강제 추방이 가능합니다.
+- **편집자** — 해당 워크스페이스의 편집을 허용합니다.
+- **뷰어** — 편집할 수 없고 읽기만 가능합니다.
+"""
+
+[[features]]
+heading = "워크스페이스 공유"
+image = "images/projects/fileinnout/workspace-share.png"
+body = """
+공유 설정은 세 가지로 나뉩니다.
+
+- **개인** — 워크스페이스를 가진 사용자만 볼 수 있고, 초대·공개 링크를 사용할 수 없습니다.
+- **공유** — 그룹이나 이메일로 초대할 수 있지만 공개 링크는 사용할 수 없습니다.
+- **공개** — 이메일 초대뿐 아니라 공개 링크를 가진 누구나 확인할 수 있습니다.
+"""
+
+[[troubleshooting]]
+title = "1. 데이터 일관성"
+problem = """
+![동시 편집 시 사용자별로 다르게 표시된 워크스페이스 화면](images/projects/fileinnout/workspace-concurrent-view.png "사용자별 워크스페이스 화면 불일치")
+
+워크스페이스는 여러 사용자가 하나의 문서를 동시에 편집하는 기능입니다. 초기 구현은 Editor.js 문서 **전체를 하나의 String으로 DB에 저장**하는 방식이었습니다.
+
+이 방식은 편집 도중 다른 사용자가 먼저 저장하거나 다른 블록을 수정하면, 최종적으로 **마지막에 저장한 사용자의 값으로 덮어써질** 뿐 아니라 사용자마다 보이는 값이 서로 달라지는 문제가 있었습니다.
+"""
+cause = """
+핵심 원인은 CRDT 사용 여부와 별개로 **병합 단위를 문서 전체로 설정한 데이터 모델**이었습니다.
+
+Yjs는 동일한 공유 타입에 들어온 변경을 결정론적으로 병합합니다. 그러나 문서 전체를 하나의 문자열로 저장하면 Yjs가 인식하는 변경 단위도 문서 전체가 됩니다. 또한 원격 변경을 받을 때마다 `editor.render()`로 문서 전체를 다시 렌더링해, 변경되지 않은 블록까지 교체되면서 입력 흐름과 커서가 흔들렸습니다.
+
+| 방식 | 판단 |
+|---|---|
+| 편집 잠금 | 데이터 충돌은 막지만 한 명만 편집할 수 있어 실시간 협업 목적과 맞지 않음 |
+| Last Write Wins | 구현은 간단하지만 늦게 도착한 전체 문서가 다른 사용자의 변경을 덮어씀 |
+| OT | 중앙 서버에서 연산 순서와 변환 규칙을 관리해야 하며 블록 추가·삭제·이동까지 처리가 복잡함 |
+| CRDT | 각 클라이언트가 독립적으로 수정해도 변경 연산을 병합하고 동일한 상태로 수렴 가능 |
+"""
+solution = """
+**CRDT(Yjs)** 를 채택하고 병합 단위를 문서 전체가 아니라 **블록 단위**로 재설계했습니다.
+
+```javascript
+export function yMapToBlock(ymap) {
+  return {
+    id: ymap.get('id'),
+    type: ymap.get('type'),
+    data: ymap.get('data'),
+  }
+}
+
+export function yArrayToBlocks(yArray) {
+  const out = []
+
+  for (let i = 0; i < yArray.length; i++) {
+    out.push(yMapToBlock(yArray.get(i)))
+  }
+
+  return out
+}
+
+function blockToYMap(Y, block) {
+  const m = new Y.Map()
+  m.set('id', block.id)
+  m.set('type', block.type)
+  m.set('data', block.data)
+  return m
+}
+```
+
+![블록 단위로 이전 데이터와 현재 데이터를 추적하는 화면](images/projects/fileinnout/block-change-tracking.png "블록 변경 데이터 추적")
+
+- 문서 전체를 하나의 JSON 문자열로 관리하지 않고, 각 EditorJS 블록을 id, type, data를 가진 독립적인 Y.Map으로 변환했습니다. 각 블록이 별도의 CRDT 객체가 되므로 서로 다른 블록에서 발생한 동시 변경을 독립적으로 병합할 수 있습니다.
+하지만 블럭이 교체되는 상황, 즉 내용이 변경되는 점은 어떻게 판단하는가가 문제였습니다.
+
+```javascript
+function blockChanged(oldBlock, newBlock) {
+  return (
+    oldBlock.type !== newBlock.type ||
+    JSON.stringify(oldBlock.data) !== JSON.stringify(newBlock.data)
+  )
+}
+
+export function diffBlocks(oldList, newList) {
+  const ops = []
+
+  const oldById = new Map(
+    oldList.map((block) => [block.id, block])
+  )
+
+  const newById = new Map(
+    newList.map((block) => [block.id, block])
+  )
+
+  // 이전 목록에만 존재하면 삭제
+  for (const oldBlock of oldList) {
+    if (!newById.has(oldBlock.id)) {
+      ops.push({
+        type: 'remove',
+        id: oldBlock.id,
+      })
+    }
+  }
+
+  // 양쪽에 존재하지만 내용이 바뀌었으면 수정
+  for (const newBlock of newList) {
+    const oldBlock = oldById.get(newBlock.id)
+
+    if (oldBlock && blockChanged(oldBlock, newBlock)) {
+      ops.push({
+        type: 'update',
+        id: newBlock.id,
+        block: newBlock,
+      })
+    }
+  }
+
+  return ops
+}
+```
+
+![Editor.js 블록의 id, type, data 구조](images/projects/fileinnout/editorjs-block-structure.png "Editor.js 블록 구조")
+
+- EditorJS의 이전 블록 목록과 현재 블록 목록을 id 기준 Map으로 변환했습니다. 이전 목록에만 존재하면 remove, 양쪽에 존재하지만 type이나 data가 달라졌으면 update 연산을 생성합니다. 이를 통해 문서 전체가 아닌 실제로 변경된 블록만 찾을 수 있습니다.
+
+그 결과 마지막 저장자가 다른 사용자의 편집을 덮어쓰던 문제와 사용자별 화면 불일치가 모두 해소되었습니다.
+"""
+
+result = """
+![여러 사용자가 동시에 워크스페이스를 편집하는 테스트](images/projects/fileinnout/workspace-test.gif "워크스페이스 실시간 협업 테스트")
+
+- 서로 다른 블록을 동시에 수정해도 두 변경사항 모두 보존
+- 동시 블록 추가도 유실 없이 병합
+- 클라이언트별 변경 수신 순서가 달라도 최종 상태 수렴
+- 전송 전 로컬 편집이 원격 변경으로 덮이는 문제 방지
+- 전체 문서 재렌더링 대신 변경된 블록만 반영
+- Redis를 통해 다중 WebSocket 서버에서도 동일한 문서 상태 공유
+"""
+
+[[troubleshooting]]
+title = "트러블슈팅 2. 워크스페이스 리스트 갱신 — 30초 폴링에서 SSE로"
+problem = """
+워크스페이스 리스트는 초대·생성·삭제가 즉시 반영되어야 합니다. 하지만 초기에는 **30초 주기 폴링**으로 갱신해, 변화가 없어도 주기적으로 요청이 쌓이고 변경이 생겨도 최대 30초까지 반영이 지연됐습니다.
+"""
+cause = """
+폴링은 서버 상태 변화와 무관하게 클라이언트가 일정 주기로 되묻는 구조입니다. 그래서 **실시간성과 효율이 동시에** 떨어졌습니다.
+
+- 대부분의 요청이 "변경 없음" 응답으로 낭비됨
+- 리스트가 길어질수록 매 폴링의 응답 비용이 함께 증가
+"""
+solution = """
+서버가 변경 시점에만 밀어주는 **SSE(Server-Sent Events)** 로 전환했습니다.
+
+- 초대·생성·삭제가 발생한 순간 해당 사용자에게 이벤트를 푸시해 리스트를 실시간 갱신
+- 주기적 폴링 요청을 제거해 불필요한 트래픽 감소
+
+추가로 워크스페이스 리스트와 버전 이력에 **페이지네이션**을 적용해, 항목이 많아져도 응답 크기와 렌더링 비용을 일정하게 유지했습니다.
+"""
+
+[[troubleshooting]]
+title = "트러블슈팅 3. Redis 기반 동시성 제어"
+problem = """
+SSE로 실시간 알림을 구현한 뒤, 배포·확장으로 백엔드 인스턴스가 여러 개(블루/그린, 스케일아웃)가 되자 문제가 드러났습니다. 한 인스턴스에서 발생한 이벤트가 **다른 인스턴스에 연결된 사용자에게는 전달되지 않았습니다.**
+"""
+cause = """
+SSE 연결과 발행 이벤트가 **각 인스턴스의 메모리 안에만** 존재했기 때문입니다. 사용자 A가 1번 인스턴스에, B가 2번 인스턴스에 연결돼 있으면 A가 만든 이벤트는 B에게 닿지 못합니다.
+"""
+solution = """
+**Redis Pub/Sub**을 이벤트 버스로 두어 인스턴스 간 이벤트를 전파했습니다.
+
+- 각 인스턴스는 이벤트를 Redis 채널에 발행(publish)
+- 모든 인스턴스가 같은 채널을 구독(subscribe)해, 자신에게 연결된 사용자에게 다시 전달
+
+덕분에 어느 인스턴스에 연결돼 있든 동일하게 알림을 받아, 다중 인스턴스 환경에서도 SSE 동시성이 보장됩니다.
+"""
 +++
 
 <section class="proj-tech-section">
