@@ -244,6 +244,8 @@ for (const item of inWeek) {
   }"
 >
 ```
+
+![날짜 셀별 반복 렌더와 주 단위 레인 배치 비교](images/projects/callog/calendar-lane.svg "캘린더 레인 배치 적용 전후")
 """
 result = """
 - 여러 날짜에 걸친 일정이 하나의 연속 막대로 표시됩니다.

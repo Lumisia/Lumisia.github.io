@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 928 470" font-family="Pretendard, 'Malgun Gothic', system-ui, sans-serif">
+  <rect x="0" y="0" width="928" height="470" rx="18" fill="#f4f7fd"/>
+
+  <!-- ===== BEFORE ===== -->
+  <text x="44" y="38" font-size="14" font-weight="700" fill="#c9372c">적용 전 — 날짜 셀별 반복 렌더</text>
+
+  <!-- grid frame -->
+  <rect x="44" y="52" width="840" height="150" rx="10" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+  <!-- column dividers + day labels -->
+  <g stroke="#e4edf8" stroke-width="1.2">
+    <line x1="164" y1="52" x2="164" y2="202"/><line x1="284" y1="52" x2="284" y2="202"/>
+    <line x1="404" y1="52" x2="404" y2="202"/><line x1="524" y1="52" x2="524" y2="202"/>
+    <line x1="644" y1="52" x2="644" y2="202"/><line x1="764" y1="52" x2="764" y2="202"/>
+  </g>
+  <line x1="44" y1="78" x2="884" y2="78" stroke="#e4edf8" stroke-width="1.2"/>
+  <g font-size="12" fill="#5b6674" text-anchor="middle">
+    <text x="104" y="70">월</text><text x="224" y="70">화</text><text x="344" y="70">수</text>
+    <text x="464" y="70">목</text><text x="584" y="70">금</text><text x="704" y="70">토</text><text x="824" y="70">일</text>
+  </g>
+  <!-- repeated chips for one multi-day event 화~금 -->
+  <g font-size="11" fill="#2e3640" text-anchor="middle">
+    <rect x="170" y="90" width="108" height="22" rx="6" fill="#e3eefa" stroke="#a9cdec"/><text x="224" y="105">캠페인 A</text>
+    <rect x="290" y="90" width="108" height="22" rx="6" fill="#e3eefa" stroke="#a9cdec"/><text x="344" y="105">캠페인 A</text>
+    <rect x="410" y="90" width="108" height="22" rx="6" fill="#e3eefa" stroke="#a9cdec"/><text x="464" y="105">캠페인 A</text>
+    <rect x="530" y="90" width="108" height="22" rx="6" fill="#e3eefa" stroke="#a9cdec"/><text x="584" y="105">캠페인 A</text>
+  </g>
+  <!-- crowded day 수 -->
+  <g font-size="11" fill="#2e3640" text-anchor="middle">
+    <rect x="290" y="118" width="108" height="22" rx="6" fill="#f0e6fb" stroke="#cdb6ee"/><text x="344" y="133">업무 1</text>
+    <rect x="290" y="146" width="108" height="22" rx="6" fill="#f0e6fb" stroke="#cdb6ee"/><text x="344" y="161">업무 2</text>
+    <rect x="290" y="174" width="108" height="22" rx="6" fill="#f0e6fb" stroke="#cdb6ee"/><text x="344" y="189">업무 3 …</text>
+  </g>
+  <text x="44" y="224" font-size="12" fill="#5b6674">같은 일정이 매일 별도 칩으로 반복되어 연속성이 보이지 않고, 일정이 몰린 날은 셀 높이가 불안정</text>
+
+  <!-- ===== AFTER ===== -->
+  <text x="44" y="266" font-size="14" font-weight="700" fill="#4d7ca8">적용 후 — 주(7일) 단위 레인 배치</text>
+
+  <rect x="44" y="280" width="840" height="150" rx="10" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+  <g stroke="#e4edf8" stroke-width="1.2">
+    <line x1="164" y1="280" x2="164" y2="430"/><line x1="284" y1="280" x2="284" y2="430"/>
+    <line x1="404" y1="280" x2="404" y2="430"/><line x1="524" y1="280" x2="524" y2="430"/>
+    <line x1="644" y1="280" x2="644" y2="430"/><line x1="764" y1="280" x2="764" y2="430"/>
+  </g>
+  <line x1="44" y1="306" x2="884" y2="306" stroke="#e4edf8" stroke-width="1.2"/>
+  <g font-size="12" fill="#5b6674" text-anchor="middle">
+    <text x="104" y="298">월</text><text x="224" y="298">화</text><text x="344" y="298">수</text>
+    <text x="464" y="298">목</text><text x="584" y="298">금</text><text x="704" y="298">토</text><text x="824" y="298">일</text>
+  </g>
+  <!-- lane 0: one continuous bar 화~금 -->
+  <rect x="170" y="318" width="468" height="26" rx="7" fill="#c6ddf2" stroke="#4d7ca8" stroke-width="1.3"/>
+  <text x="404" y="335" font-size="12" font-weight="600" fill="#2e3640" text-anchor="middle">캠페인 A  (startCol → endCol)</text>
+  <!-- lane 1: overlapping event 수~목 -->
+  <rect x="290" y="350" width="228" height="26" rx="7" fill="#e2d4f6" stroke="#8a6fc0" stroke-width="1.3"/>
+  <text x="404" y="367" font-size="12" font-weight="600" fill="#2e3640" text-anchor="middle">업무 B (겹침 → 레인 1)</text>
+  <!-- fold +N -->
+  <rect x="290" y="382" width="60" height="22" rx="11" fill="#eef3fe" stroke="#a9cdec"/>
+  <text x="320" y="397" font-size="11" font-weight="700" fill="#4d7ca8" text-anchor="middle">+2</text>
+  <text x="44" y="452" font-size="12" fill="#5b6674">다일정은 하나의 연속 막대 · 겹치면 가장 낮은 빈 레인에 분리 배치 · 표시 한도 초과분은 날짜별 +N으로 접기</text>
+</svg>
