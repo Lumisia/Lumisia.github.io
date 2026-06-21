@@ -339,6 +339,10 @@ body > .main {
   width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block;
   background: var(--blue-soft);
  }
+ .tile-img--contain {
+  object-fit: contain;
+  background: #f4f7fd;
+ }
  .tile-overlay {
   position: absolute; inset: 0; z-index: 2;
   background: color-mix(in srgb, var(--blue-deep) 92%, transparent);
@@ -896,6 +900,15 @@ h2.proj-sec-h {
  border: 1px solid var(--blue-hair);
  margin: 16px 0;
 }
+.feature-shot-grid {
+ display: grid;
+ grid-template-columns: repeat(2, 1fr);
+ gap: 16px;
+ margin: 16px 0;
+}
+.feature-shot-grid .feature-shot {
+ margin: 0;
+}
 .feature-copy ul {
  margin: 0;
  padding-left: 18px;
@@ -922,4 +935,5 @@ h2.proj-sec-h {
  .proj-tech-grid { grid-template-columns: repeat(2, 1fr); }
  .implementation-grid,
  .troubleshooting-flow { grid-template-columns: 1fr; }
+ .feature-shot-grid { grid-template-columns: 1fr; }
 }

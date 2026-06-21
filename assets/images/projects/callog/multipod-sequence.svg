@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" font-family="Pretendard, 'Malgun Gothic', system-ui, sans-serif">
+  <defs>
+    <marker id="sa" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#5b6674"/>
+    </marker>
+    <marker id="sb" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#4d7ca8"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="600" rx="18" fill="#f4f7fd"/>
+
+  <!-- lifelines -->
+  <g stroke="#c4d3e8" stroke-width="1.4" stroke-dasharray="4 5">
+    <line x1="150" y1="98" x2="150" y2="560"/>
+    <line x1="315" y1="98" x2="315" y2="560"/>
+    <line x1="480" y1="98" x2="480" y2="560"/>
+    <line x1="770" y1="98" x2="770" y2="560"/>
+  </g>
+
+  <!-- headers -->
+  <g>
+    <rect x="95" y="56" width="110" height="42" rx="11" fill="#e3eefa" stroke="#4d7ca8" stroke-width="1.4"/>
+    <text x="150" y="83" font-size="14" font-weight="700" fill="#2e3640" text-anchor="middle">Pod A</text>
+    <rect x="260" y="56" width="110" height="42" rx="11" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+    <text x="315" y="83" font-size="14" font-weight="700" fill="#2e3640" text-anchor="middle">Pod B</text>
+    <rect x="425" y="56" width="110" height="42" rx="11" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+    <text x="480" y="83" font-size="14" font-weight="700" fill="#2e3640" text-anchor="middle">Pod C</text>
+    <rect x="705" y="56" width="130" height="42" rx="11" fill="#fdecec" stroke="#c9372c" stroke-width="1.5"/>
+    <text x="770" y="83" font-size="14" font-weight="700" fill="#c9372c" text-anchor="middle">Redis</text>
+  </g>
+
+  <!-- Phase 1 -->
+  <text x="34" y="128" font-size="13" font-weight="700" fill="#4d7ca8">① 분산 락 — KPI 스냅샷 중복 방지</text>
+
+  <!-- m1 A->Redis SET NX -->
+  <text x="460" y="152" font-size="12.5" fill="#2e3640" text-anchor="middle">SET NX lock:snapshot:daily (UUID token)</text>
+  <line x1="150" y1="160" x2="768" y2="160" stroke="#5b6674" stroke-width="1.5" marker-end="url(#sa)"/>
+  <!-- m2 Redis-->A OK -->
+  <text x="460" y="182" font-size="12.5" fill="#4d7ca8" text-anchor="middle">OK · 락 획득 (Pod A)</text>
+  <line x1="770" y1="190" x2="152" y2="190" stroke="#4d7ca8" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#sb)"/>
+
+  <!-- m3 B->Redis -->
+  <text x="540" y="216" font-size="12.5" fill="#2e3640" text-anchor="middle">SET NX (동일 키)</text>
+  <line x1="315" y1="224" x2="768" y2="224" stroke="#5b6674" stroke-width="1.5" marker-end="url(#sa)"/>
+  <!-- m4 Redis-->B nil -->
+  <text x="540" y="246" font-size="12.5" fill="#5b6674" text-anchor="middle">nil → return (skip)</text>
+  <line x1="770" y1="254" x2="317" y2="254" stroke="#4d7ca8" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#sb)"/>
+
+  <!-- m5 C->Redis -->
+  <text x="623" y="280" font-size="12.5" fill="#2e3640" text-anchor="middle">SET NX (동일 키)</text>
+  <line x1="480" y1="288" x2="768" y2="288" stroke="#5b6674" stroke-width="1.5" marker-end="url(#sa)"/>
+  <!-- m6 Redis-->C nil -->
+  <text x="623" y="310" font-size="12.5" fill="#5b6674" text-anchor="middle">nil → return (skip)</text>
+  <line x1="770" y1="318" x2="482" y2="318" stroke="#4d7ca8" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#sb)"/>
+
+  <!-- m7 A self saveDailySnapshots -->
+  <path d="M150 342 h54 v20 h-52" fill="none" stroke="#5b6674" stroke-width="1.5" marker-end="url(#sa)"/>
+  <text x="214" y="358" font-size="12.5" fill="#2e3640">saveDailySnapshots() 실행</text>
+
+  <!-- m8 A->Redis unlock -->
+  <text x="460" y="388" font-size="12.5" fill="#2e3640" text-anchor="middle">Lua Script: token 일치할 때만 DEL (안전 해제)</text>
+  <line x1="150" y1="396" x2="768" y2="396" stroke="#5b6674" stroke-width="1.5" marker-end="url(#sa)"/>
+
+  <!-- divider -->
+  <line x1="34" y1="418" x2="926" y2="418" stroke="#d2e3f2" stroke-width="1.2" stroke-dasharray="2 6"/>
+
+  <!-- Phase 2 -->
+  <text x="34" y="444" font-size="13" font-weight="700" fill="#4d7ca8">② SSE 전달 — Redis Pub/Sub 중계</text>
+
+  <!-- m9 A->Redis publish -->
+  <text x="460" y="468" font-size="12.5" fill="#2e3640" text-anchor="middle">PUBLISH sse:events (이벤트 발생 Pod)</text>
+  <line x1="150" y1="476" x2="768" y2="476" stroke="#5b6674" stroke-width="1.5" marker-end="url(#sa)"/>
+
+  <!-- m10 broadcast Redis -> A,B,C -->
+  <text x="430" y="500" font-size="12.5" fill="#4d7ca8" text-anchor="middle">onMessage — 구독 중인 모든 Pod로 fan-out</text>
+  <line x1="770" y1="508" x2="152" y2="508" stroke="#4d7ca8" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#sb)"/>
+  <line x1="770" y1="508" x2="317" y2="508" stroke="#4d7ca8" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#sb)"/>
+  <line x1="770" y1="508" x2="482" y2="508" stroke="#4d7ca8" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#sb)"/>
+
+  <!-- self deliver note -->
+  <text x="315" y="536" font-size="12.5" fill="#5b6674" text-anchor="middle">각 Pod는 자신에게 연결된 SseEmitter로만 전달</text>
+
+  <!-- fallback note box -->
+  <rect x="540" y="520" width="386" height="40" rx="11" fill="#fff7ec" stroke="#d9a441" stroke-width="1.2"/>
+  <text x="733" y="538" font-size="12" fill="#2e3640" text-anchor="middle">fallback — Redis 발행 실패 시</text>
+  <text x="733" y="553" font-size="12" fill="#5b6674" text-anchor="middle">현재 Pod 로컬 연결에는 직접 전달</text>
+</svg>

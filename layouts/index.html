@@ -85,7 +85,7 @@
         {{- $project := . }}
         <a class="proj-tile reveal" href="{{ .RelPermalink }}">
           {{- with resources.Get .Params.cover.image }}
-          <img class="tile-img" src="{{ .RelPermalink }}" alt="{{ $project.Title }} 대표 이미지">
+          <img class="tile-img{{ if eq $project.Params.cover.fit "contain" }} tile-img--contain{{ end }}" src="{{ .RelPermalink }}" alt="{{ $project.Title }} 대표 이미지">
           {{- end }}
           <div class="tile-overlay">
             <span class="tile-cat">{{ .Params.category }}</span>
@@ -124,7 +124,7 @@
           <p class="tl-sub">백엔드 심화 과정 · Java · Spring Boot · MSA · Kubernetes</p>
           <ul class="tl-points">
             <li><b>FileinNout</b> — 파일 저장 및 협업 워크스페이스 플랫폼, Yjs Websocket + Editor.js로 실시간 협업 페이지 구성, Redis를 통해 동시성 제어</li>
-            <li><b>Callog</b> — 마케팅 협업 플랫폼, 전반적인 RESTful API 시스템 구성, Redis로 조회성능 TPS 약 12.3배 상승</li>
+            <li><b>Callog</b> — 마케팅 협업 플랫폼, 캠페인·KPI·대시보드 API 구성, JPA 쿼리 최적화와 Redis 캐시로 TPS 약 13.9배 향상</li>
             <li>Kafka · Argo Rollout · Kubernetes 기반 무중단 배포 환경 직접 구성</li>
           </ul>
         </div>

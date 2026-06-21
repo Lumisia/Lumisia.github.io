@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" font-family="Pretendard, 'Malgun Gothic', system-ui, sans-serif">
+  <defs>
+    <marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#5b6674"/>
+    </marker>
+    <marker id="arS" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#4d7ca8"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="520" rx="18" fill="#f4f7fd"/>
+
+  <!-- section labels -->
+  <text x="34" y="58" font-size="13" font-weight="700" fill="#4d7ca8">① 통합 응답 캐시 조회 · 저장</text>
+  <text x="34" y="330" font-size="13" font-weight="700" fill="#4d7ca8">② 선택적 무효화</text>
+  <text x="34" y="420" font-size="13" font-weight="700" fill="#4d7ca8">③ Redis → Valkey 호환 전환</text>
+
+  <!-- Lane 1 -->
+  <g stroke="#5b6674" stroke-width="1.6" fill="none" marker-end="url(#ar)">
+    <line x1="206" y1="108" x2="246" y2="108"/>
+    <line x1="466" y1="108" x2="516" y2="108"/>
+    <line x1="360" y1="146" x2="360" y2="190"/>
+    <line x1="556" y1="200" x2="620" y2="150"/>
+  </g>
+
+  <!-- Box1 request -->
+  <rect x="34" y="76" width="172" height="64" rx="13" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+  <text x="120" y="104" font-size="15" font-weight="600" fill="#2e3640" text-anchor="middle">대시보드</text>
+  <text x="120" y="124" font-size="15" font-weight="600" fill="#2e3640" text-anchor="middle">통합 요청</text>
+
+  <!-- Box2 cache lookup -->
+  <rect x="246" y="72" width="220" height="72" rx="13" fill="#e3eefa" stroke="#4d7ca8" stroke-width="1.5"/>
+  <text x="356" y="100" font-size="15" font-weight="700" fill="#2e3640" text-anchor="middle">캐시 조회</text>
+  <text x="356" y="124" font-size="13" fill="#4d7ca8" text-anchor="middle" font-family="ui-monospace, Consolas, monospace">caller:분기:v{n}</text>
+
+  <!-- HIT label -->
+  <text x="491" y="100" font-size="12" font-weight="700" fill="#4d7ca8" text-anchor="middle">HIT</text>
+
+  <!-- Box3 response -->
+  <rect x="516" y="76" width="224" height="64" rx="13" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+  <text x="628" y="104" font-size="15" font-weight="600" fill="#2e3640" text-anchor="middle">Redis · Valkey</text>
+  <text x="628" y="124" font-size="15" font-weight="600" fill="#2e3640" text-anchor="middle">캐시 즉시 응답</text>
+
+  <!-- MISS label -->
+  <text x="378" y="172" font-size="12" font-weight="700" fill="#5b6674">MISS</text>
+
+  <!-- Box4 DB aggregate -->
+  <rect x="246" y="190" width="310" height="70" rx="13" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+  <text x="401" y="218" font-size="14.5" font-weight="600" fill="#2e3640" text-anchor="middle">DB 집계 loadAll() · sync=true</text>
+  <text x="401" y="240" font-size="13" fill="#5b6674" text-anchor="middle">동일 키는 한 스레드만 계산 (Stampede 방지)</text>
+
+  <!-- 저장 label -->
+  <text x="600" y="186" font-size="12" font-weight="700" fill="#5b6674">저장 후 응답</text>
+
+  <!-- Lane 2 -->
+  <g stroke="#5b6674" stroke-width="1.6" fill="none" marker-end="url(#ar)">
+    <line x1="200" y1="372" x2="240" y2="372"/>
+  </g>
+  <rect x="34" y="342" width="166" height="60" rx="13" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+  <text x="117" y="378" font-size="15" font-weight="600" fill="#2e3640" text-anchor="middle">데이터 변경</text>
+
+  <rect x="240" y="342" width="370" height="60" rx="13" fill="#e3eefa" stroke="#4d7ca8" stroke-width="1.5"/>
+  <text x="425" y="368" font-size="14.5" font-weight="700" fill="#2e3640" text-anchor="middle">해당 사용자 version++ → 그 버전 키만 무효화</text>
+  <text x="425" y="389" font-size="12.5" fill="#4d7ca8" text-anchor="middle">전체 캐시 삭제 없음</text>
+
+  <!-- Lane 3 -->
+  <rect x="34" y="434" width="158" height="64" rx="13" fill="#fdecec" stroke="#c9372c" stroke-width="1.5"/>
+  <text x="113" y="472" font-size="17" font-weight="700" fill="#c9372c" text-anchor="middle">Redis</text>
+
+  <rect x="768" y="434" width="158" height="64" rx="13" fill="#e3eefa" stroke="#4d7ca8" stroke-width="1.5"/>
+  <text x="847" y="472" font-size="17" font-weight="700" fill="#4d7ca8" text-anchor="middle">Valkey</text>
+
+  <g stroke="#4d7ca8" stroke-width="1.8" fill="none" marker-end="url(#arS)" marker-start="url(#arS)">
+    <line x1="200" y1="466" x2="760" y2="466"/>
+  </g>
+  <rect x="330" y="446" width="300" height="40" rx="20" fill="#f4f7fd" stroke="#4d7ca8" stroke-width="1.2"/>
+  <text x="480" y="464" font-size="13" font-weight="600" fill="#2e3640" text-anchor="middle">프로토콜 · Lettuce 연결 호환</text>
+  <text x="480" y="480" font-size="12" fill="#5b6674" text-anchor="middle">애플리케이션 코드 유지, ConfigMap host만 교체</text>
+</svg>

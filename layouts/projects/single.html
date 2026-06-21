@@ -106,8 +106,20 @@
           {{- range . }}
           <article class="feature-block">
             {{- with .heading }}<h3 class="proj-detail-title">{{ . }}</h3>{{- end }}
+            {{- with .images }}
+            <div class="feature-shot-grid">
+              {{- range . }}
+              {{- $alt := .alt | default (printf "%s 화면" $.Title) }}
+              {{- with resources.Get .image }}
+              <img class="feature-shot" src="{{ .RelPermalink }}" alt="{{ $alt }}" loading="lazy">
+              {{- end }}
+              {{- end }}
+            </div>
+            {{- else }}
+            {{- $alt := .image_alt | default (printf "%s 화면" $.Title) }}
             {{- with resources.Get .image }}
-            <img class="feature-shot" src="{{ .RelPermalink }}" alt="{{ $.Title }} 화면" loading="lazy">
+            <img class="feature-shot" src="{{ .RelPermalink }}" alt="{{ $alt }}" loading="lazy">
+            {{- end }}
             {{- end }}
             {{- with .body }}<div class="proj-detail-copy feature-copy">{{ . | markdownify }}</div>{{- end }}
           </article>
