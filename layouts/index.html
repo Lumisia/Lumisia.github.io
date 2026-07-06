@@ -108,7 +108,11 @@
         </a>
         <div class="gh-stats">
           <div class="gh-card gh-stats-card">
+            {{- with resources.Get "images/github/github-metrics.svg" }}
+            <img id="gh-stats-img" src="{{ .RelPermalink }}" alt="GitHub 활동 통계" loading="lazy">
+            {{- else }}
             <img id="gh-stats-img" alt="GitHub 활동 통계" loading="lazy">
+            {{- end }}
             <a class="gh-fallback" id="gh-stats-fallback" href="{{ site.Params.githubURL }}" target="_blank" rel="noopener" hidden>
               <span class="gh-fallback-kicker">GitHub</span>
               <strong>활동 통계를 불러오지 못했습니다</strong>

@@ -4,7 +4,8 @@ on:
   push:
     branches: ["main"]
   schedule:
-    - cron: '0 15 * * *'
+    # Daily at 03:17 KST. Avoid top-of-hour GitHub Actions congestion.
+    - cron: '17 18 * * *'
   workflow_dispatch:
 
 permissions:
@@ -25,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       HUGO_VERSION: 0.148.0
+      METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
     steps:
       - name: Install Hugo CLI
         run: |
@@ -35,6 +37,27 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Generate GitHub metrics
+        if: ${{ env.METRICS_TOKEN != '' }}
+        uses: lowlighter/metrics@latest
+        with:
+          token: ${{ env.METRICS_TOKEN }}
+          user: Lumisia
+          filename: github-metrics.svg
+          output_action: none
+          template: classic
+          config_timezone: Asia/Seoul
+          config_display: regular
+          config_output: svg
+          base: header, activity, repositories
+      - name: Install generated GitHub metrics
+        if: ${{ env.METRICS_TOKEN != '' }}
+        run: |
+          mkdir -p assets/images/github
+          cp /metrics_renders/github-metrics.svg assets/images/github/github-metrics.svg
+      - name: Use bundled GitHub metrics placeholder
+        if: ${{ env.METRICS_TOKEN == '' }}
+        run: echo "::warning::METRICS_TOKEN is not set; using bundled placeholder metrics SVG."
       - name: Fetch Tistory blog posts
         run: |
           python3 << 'EOF'

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="180" viewBox="0 0 480 180" role="img" aria-labelledby="title desc">
+  <title id="title">GitHub metrics pending</title>
+  <desc id="desc">Placeholder shown until the scheduled metrics workflow renders the latest GitHub statistics.</desc>
+  <rect width="480" height="180" rx="14" fill="#ffffff"/>
+  <rect x="0.5" y="0.5" width="479" height="179" rx="13.5" fill="none" stroke="#d2e3f2"/>
+  <text x="240" y="78" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#4d7ca8">GITHUB METRICS</text>
+  <text x="240" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#2e3640">Waiting for first scheduled update</text>
+  <text x="240" y="129" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#5b6674">Set METRICS_TOKEN, then run the Pages workflow.</text>
+</svg>
