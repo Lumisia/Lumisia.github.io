@@ -107,7 +107,14 @@
           <img class="gh-graph" id="gh-graph" alt="GitHub 컨트리뷰션 그래프" loading="lazy">
         </a>
         <div class="gh-stats">
-          <div class="gh-card"><img id="gh-stats-img" alt="GitHub 활동 통계" loading="lazy"></div>
+          <div class="gh-card gh-stats-card">
+            <img id="gh-stats-img" alt="GitHub 활동 통계" loading="lazy">
+            <a class="gh-fallback" id="gh-stats-fallback" href="{{ site.Params.githubURL }}" target="_blank" rel="noopener" hidden>
+              <span class="gh-fallback-kicker">GitHub</span>
+              <strong>활동 통계를 불러오지 못했습니다</strong>
+              <span>프로필에서 최신 활동 보기</span>
+            </a>
+          </div>
           <div class="gh-card"><img id="gh-streak-img" alt="GitHub 연속 커밋 기록" loading="lazy"></div>
         </div>
       </div>

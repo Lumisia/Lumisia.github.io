@@ -233,23 +233,105 @@ result = """
 """
 
 [[troubleshooting]]
-title = "트러블슈팅 2. 워크스페이스 리스트 갱신 — 30초 폴링에서 SSE로"
+title = "2. 워크스페이스 조회 개선 — 30초 폴링에서 SSE 기반 갱신으로"
 problem = """
-워크스페이스 리스트는 초대·생성·삭제가 즉시 반영되어야 합니다. 하지만 초기에는 **30초 주기 폴링**으로 갱신해, 변화가 없어도 주기적으로 요청이 쌓이고 변경이 생겨도 최대 30초까지 반영이 지연됐습니다.
+워크스페이스 리스트는 초대·생성·삭제·제목 변경이 즉시 반영되어야 하는 화면입니다. 기존 구조는 **30초 주기 폴링**으로 서버에 반복 요청해 데이터를 다시 가져왔습니다.
+
+![30초 폴링과 전체 엔티티 조회를 사용하던 개선 전 nGrinder 결과](images/projects/fileinnout/workspace-list-before.png "워크스페이스 리스트 조회 개선 전")
+
+이 방식은 변경이 없어도 계속 요청이 발생했고, 변경이 생겨도 다음 폴링 시점까지 최대 30초 지연될 수 있었습니다. 또한 워크스페이스 목록을 가져올 때 필요하지 않은 데이터까지 함께 조회해 리스트 응답 비용이 커졌습니다.
+
+```js
+// 개선 전: 일정 주기마다 리스트 재조회
+setInterval(() => {
+  fetchWorkspaceList()
+}, 30000)
+```
+
+```java
+public List<PostDto.ResList> list(Long userIdx) {
+    List<UserPost> userPosts = upr.findByUserIdx(userIdx);
+
+    return userPosts.stream()
+            .map(userPost -> PostDto.ResList.builder()
+                    .postIdx(userPost.getWorkspace().getIdx())
+                    .title(userPost.getWorkspace().getTitle())
+                    .updatedAt(userPost.getWorkspace().getUpdatedAt())
+                    .level(userPost.getLevel())
+                    .build())
+            .toList();
+}
+```
 """
 cause = """
-폴링은 서버 상태 변화와 무관하게 클라이언트가 일정 주기로 되묻는 구조입니다. 그래서 **실시간성과 효율이 동시에** 떨어졌습니다.
+핵심 원인은 갱신 책임과 조회 비용이 모두 클라이언트 폴링에 묶여 있었던 점입니다.
 
-- 대부분의 요청이 "변경 없음" 응답으로 낭비됨
-- 리스트가 길어질수록 매 폴링의 응답 비용이 함께 증가
+- 폴링은 서버 변경 여부와 관계없이 요청을 발생시켜 대부분의 요청이 낭비됩니다.
+- 변경이 생겨도 클라이언트의 다음 30초 주기까지 화면 반영이 늦어집니다.
+- 기존 리스트 조회는 사용자 워크스페이스 엔티티를 먼저 가져온 뒤 DTO로 변환해, 목록 화면에 필요 없는 필드까지 로딩할 수 있습니다.
+- 목록 크기가 커질수록 매 폴링의 DB 조회·직렬화·렌더링 비용이 같이 커집니다.
+
+| 항목 | 개선 전 | 개선 후 | 변화 |
+|---|---:|---:|---:|
+| Total Users | 100 | 100 | 동일 조건 |
+| TPS | 32.7 | 192.4 | 약 5.88배 증가 |
+| Peak TPS | 40.5 | 283.0 | 약 6.99배 증가 |
+| Mean Test Time | 1,506.77ms | 162.04ms | 약 89.2% 감소 |
+| Executed Tests | 3,530 | 20,410 | 약 5.78배 증가 |
+| Errors | 0 | 0 | 오류 없음 |
 """
 solution = """
-서버가 변경 시점에만 밀어주는 **SSE(Server-Sent Events)** 로 전환했습니다.
+갱신 방식은 **SSE(Server-Sent Events)** 로 바꾸고, 실제 목록 조회 API는 **Projection + 페이지네이션** 기반으로 줄였습니다. 서버가 변경 이벤트를 사용자에게 푸시하고, 클라이언트는 이벤트를 받았을 때만 필요한 화면을 갱신합니다.
 
-- 초대·생성·삭제가 발생한 순간 해당 사용자에게 이벤트를 푸시해 리스트를 실시간 갱신
-- 주기적 폴링 요청을 제거해 불필요한 트래픽 감소
+![SSE와 Projection 기반 페이지 조회를 적용한 개선 후 nGrinder 결과](images/projects/fileinnout/workspace-list-after.png "워크스페이스 리스트 조회 개선 후")
 
-추가로 워크스페이스 리스트와 버전 이력에 **페이지네이션**을 적용해, 항목이 많아져도 응답 크기와 렌더링 비용을 일정하게 유지했습니다.
+```java
+@GetMapping(value = "/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+public SseEmitter connect(@AuthenticationPrincipal AuthUserDetails user) {
+    SseEmitter emitter = new SseEmitter(60 * 1000L * 60);
+    emitterStore.put(user.getUserIdx(), UUID.randomUUID().toString(), emitter);
+    return emitter;
+}
+```
+
+```js
+eventSource.addEventListener('title-updated', (event) => {
+  window.dispatchEvent(new CustomEvent('sse-title-updated', {
+    detail: JSON.parse(event.data)
+  }))
+})
+```
+
+```java
+@GetMapping("/workspace/list")
+public ResponseEntity<List<PostDto.ResList>> list(
+        @CurrentUser User user,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "50") int size
+) {
+    return ResponseEntity.ok(postService.list(user.getIdx(), page, size));
+}
+```
+
+```java
+@Query(\"\"\"
+    SELECT w.idx as postIdx, w.title as title, w.updatedAt as updatedAt,
+           w.status as status, w.UUID as uuid, up.Level as level
+    FROM UserPost up
+    JOIN up.workspace w
+    WHERE up.user.idx = :userIdx
+    ORDER BY w.updatedAt DESC, w.createdAt DESC
+\"\"\")
+List<WorkspaceListProjection> findWorkspaceListByUserIdx(
+        @Param("userIdx") Long userIdx,
+        Pageable pageable
+);
+```
+"""
+result = """
+100명의 가상 사용자를 기준으로 nGrinder 부하 테스트를 진행했습니다. 평균 응답시간은 **1,506.77ms에서 162.04ms로 약 89.2% 감소**했고, TPS는 **32.7에서 192.4로 약 5.88배 증가**했습니다. 두 테스트 모두 오류는 0건이었습니다.
+
+즉, 워크스페이스 리스트는 변경 감지를 SSE로 실시간화하고, 조회 API는 Projection과 페이지네이션으로 가볍게 만들어 안정적으로 확장될 수 있도록 개선했습니다.
 """
 
 [[troubleshooting]]

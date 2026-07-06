@@ -21,6 +21,22 @@
   const canvasTone = shell ? (shell.dataset.canvasTone || 'pale') : 'pale';
   const githubUser = shell ? shell.dataset.githubUser : null;
 
+  function bindImageFallback(img, fallbackId) {
+    const fallback = document.getElementById(fallbackId);
+    if (!img || !fallback) return;
+
+    img.classList.remove('is-hidden');
+    fallback.hidden = true;
+    img.onload = () => {
+      img.classList.remove('is-hidden');
+      fallback.hidden = true;
+    };
+    img.onerror = () => {
+      img.classList.add('is-hidden');
+      fallback.hidden = false;
+    };
+  }
+
   function updateGithub(set, theme, palette) {
     if (!githubUser) return;
     const hex = (color) => color.replace('#', '');
@@ -34,7 +50,8 @@
       graph.src = `https://ghchart.rshah.org/${hex(set.light.deep)}/${githubUser}`;
     }
     if (stats) {
-      stats.src = `https://github-readme-stats.vercel.app/api?username=${githubUser}&show_icons=true&hide_border=true&bg_color=00000000&title_color=${hex(palette.deep)}&text_color=${ink}&icon_color=${hex(palette.blue)}&ring_color=${hex(palette.deep)}`;
+      bindImageFallback(stats, 'gh-stats-fallback');
+      stats.src = `https://github-readme-stats.vercel.app/api?username=${githubUser}&show_icons=true&hide_border=true&include_all_commits=true&bg_color=00000000&title_color=${hex(palette.deep)}&text_color=${ink}&icon_color=${hex(palette.blue)}&ring_color=${hex(palette.deep)}`;
     }
     if (streak) {
       streak.src = `https://streak-stats.demolab.com?user=${githubUser}&hide_border=true&background=00000000&ring=${hex(palette.deep)}&fire=${hex(palette.deep)}&currStreakLabel=${hex(palette.deep)}&sideLabels=${ink}&currStreakNum=${ink}&sideNums=${ink}&dates=${dim}`;
