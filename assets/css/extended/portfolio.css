@@ -196,6 +196,28 @@ body > .main {
   line-height: 1.6;
   color: var(--secondary);
  }
+ .monitoring-table {
+  width: 100%;
+  margin: 12px 0 0;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  line-height: 1.55;
+ }
+ .monitoring-table th,
+ .monitoring-table td {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+ }
+ .monitoring-table th {
+  background: var(--card);
+  white-space: nowrap;
+ }
+ .monitoring-table td:first-child {
+  white-space: nowrap;
+  font-weight: 600;
+ }
  .pill-monitor {
   background: var(--card);
   border: 1px solid var(--blue-hair);

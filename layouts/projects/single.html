@@ -42,7 +42,7 @@
         {{- with .Params.monitoring_links }}
         <div class="project-monitoring-links">
           {{- range . }}
-          <a class="pill pill-monitor pill-monitor--{{ .icon }}" href="{{ .url }}" target="_blank" rel="noopener" title="{{ .desc | default .label }}">
+          <a class="pill pill-monitor pill-monitor--{{ .icon }}" href="{{ .url }}" target="_blank" rel="noopener" title="{{ .label }}">
             {{- if eq .icon "kiali" }}
             <img class="monitor-icon" width="15" height="15"
               src="https://raw.githubusercontent.com/kiali/kiali/master/frontend/public/kiali_icon_lightbkg_16px.png"
@@ -60,6 +60,24 @@
       </div>
       {{- with .Params.monitoring_note }}
       <p class="monitoring-note">{{ . | markdownify }}</p>
+      {{- end }}
+      {{- with .Params.monitoring_links }}
+      {{- $rows := where . "reason" "!=" nil }}
+      {{- if $rows }}
+      <table class="monitoring-table">
+        <thead>
+          <tr><th>관측 도구</th><th>보여주는 것 · 공개한 이유</th></tr>
+        </thead>
+        <tbody>
+          {{- range $rows }}
+          <tr>
+            <td><a href="{{ .url }}" target="_blank" rel="noopener">{{ .label }}</a></td>
+            <td>{{ .reason | markdownify }}</td>
+          </tr>
+          {{- end }}
+        </tbody>
+      </table>
+      {{- end }}
       {{- end }}
       {{- end }}
 

@@ -24,37 +24,37 @@ monitoring_note = """
 
 [[monitoring_links]]
 label = "Jaeger"
-desc  = "분산 트레이싱 — 요청이 거치는 서비스 경로와 지연 구간 확인"
+reason = "분산 트레이싱 — 요청이 게이트웨이·백엔드를 거치는 경로와 지연 구간을 실제 트래픽 기준으로 추적합니다. Istio 텔레메트리를 직접 연동했음을 보여줍니다."
 url   = "https://jaeger.fileinnout.com/search?end=1781757710987000&limit=20&lookback=1h&maxDuration&minDuration&service=jaeger-all-in-one&start=1781754110987000"
 icon  = "jaeger"
 
 [[monitoring_links]]
 label = "Dashboard"
-desc  = "Kubernetes Dashboard — 운영 중인 Pod·워크로드 상태 (읽기 전용)"
+reason = "Kubernetes 워크로드 현황 — 서비스가 실제 k3s 클러스터에서 돌아가고 있음을 Pod 단위로 확인할 수 있습니다 (읽기 전용 공개)."
 url   = "https://dashboard.fileinnout.com/#/workloads?namespace=fileinnout"
 icon  = "kubernetes"
 
 [[monitoring_links]]
 label = "Swagger"
-desc  = "백엔드 API 명세 — 실제 서버 대상으로 호출 테스트 가능"
+reason = "백엔드 API 명세 — 문서 캡처가 아니라 실제 운영 서버에 바로 호출해볼 수 있도록 열어뒀습니다."
 url   = "https://swagger.fileinnout.com/"
 icon  = "swagger"
 
 [[monitoring_links]]
 label = "Kiali"
-desc  = "Istio 서비스 메시 — 서비스 간 트래픽 토폴로지"
+reason = "서비스 메시 토폴로지 — Istio 메시 안에서 서비스 간 트래픽 흐름을 시각적으로 확인할 수 있습니다."
 url   = "https://kiali.fileinnout.com/kiali/console/mesh?duration=300&refresh=60000&meshLayout=dagre"
 icon  = "kiali"
 
 [[monitoring_links]]
 label = "Prometheus"
-desc  = "메트릭 수집기 — 스크랩 대상과 수집 상태(/targets)"
+reason = "메트릭 수집 파이프라인 — 어떤 대상을 어떻게 스크랩하는지 /targets 상태를 그대로 공개합니다."
 url   = "https://prometheus.fileinnout.com/targets"
 icon  = "prometheus"
 
 [[monitoring_links]]
 label = "Grafana"
-desc  = "메트릭 대시보드 — 노드 CPU·메모리·네트워크 실시간"
+reason = "운영 메트릭 대시보드 — 서버 노드의 CPU·메모리·네트워크를 실시간 그래프로 확인할 수 있습니다."
 url   = "https://grafana.fileinnout.com/d/rYdddlPWk/node-exporter-full?orgId=1&from=now-5m&to=now&timezone=browser&var-ds_prometheus=PBFA97CFB590B2093&var-job=kubernetes-service-endpoints&var-nodename=instance20260526051902&var-node=10.0.0.164:9100&refresh=1m"
 icon  = "grafana"
 
