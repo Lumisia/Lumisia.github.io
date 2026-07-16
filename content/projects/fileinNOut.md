@@ -18,33 +18,43 @@ features_intro = """
 제가 설계하고 구현한 **워크스페이스**는 여러 사용자가 하나의 문서를 실시간으로 함께 편집하는 협업 공간입니다. 문서 작성, 첨부파일, 버전 이력, 권한·공유 설정까지 워크스페이스의 전 영역을 담당했습니다.
 """
 
+monitoring_note = """
+🔎 위 관측 버튼들은 캡처 이미지가 아니라, 수료 후 직접 구축해 운영 중인 **k3s 클러스터에 읽기 전용으로 연결**됩니다. 배포 상태 · 메트릭 · 분산 트레이싱을 방문 시점 기준 실시간으로 확인할 수 있습니다.
+"""
+
 [[monitoring_links]]
 label = "Jaeger"
+desc  = "분산 트레이싱 — 요청이 거치는 서비스 경로와 지연 구간 확인"
 url   = "https://jaeger.fileinnout.com/search?end=1781757710987000&limit=20&lookback=1h&maxDuration&minDuration&service=jaeger-all-in-one&start=1781754110987000"
 icon  = "jaeger"
 
 [[monitoring_links]]
 label = "Dashboard"
+desc  = "Kubernetes Dashboard — 운영 중인 Pod·워크로드 상태 (읽기 전용)"
 url   = "https://dashboard.fileinnout.com/#/workloads?namespace=fileinnout"
 icon  = "kubernetes"
 
 [[monitoring_links]]
 label = "Swagger"
+desc  = "백엔드 API 명세 — 실제 서버 대상으로 호출 테스트 가능"
 url   = "https://swagger.fileinnout.com/"
 icon  = "swagger"
 
 [[monitoring_links]]
 label = "Kiali"
+desc  = "Istio 서비스 메시 — 서비스 간 트래픽 토폴로지"
 url   = "https://kiali.fileinnout.com/kiali/console/mesh?duration=300&refresh=60000&meshLayout=dagre"
 icon  = "kiali"
 
 [[monitoring_links]]
 label = "Prometheus"
+desc  = "메트릭 수집기 — 스크랩 대상과 수집 상태(/targets)"
 url   = "https://prometheus.fileinnout.com/targets"
 icon  = "prometheus"
 
 [[monitoring_links]]
 label = "Grafana"
+desc  = "메트릭 대시보드 — 노드 CPU·메모리·네트워크 실시간"
 url   = "https://grafana.fileinnout.com/d/rYdddlPWk/node-exporter-full?orgId=1&from=now-5m&to=now&timezone=browser&var-ds_prometheus=PBFA97CFB590B2093&var-job=kubernetes-service-endpoints&var-nodename=instance20260526051902&var-node=10.0.0.164:9100&refresh=1m"
 icon  = "grafana"
 
