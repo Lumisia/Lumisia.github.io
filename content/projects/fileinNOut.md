@@ -26,7 +26,6 @@ monitoring_note = """
 title = "수료 후 단독 고도화 (2026.06 ~ )"
 note = "팀 프로젝트 종료 후 개인 리포지토리로 이어받아 실제 운영 수준으로 끌어올리고 있습니다. **아래는 전부 수료 후 혼자 작업한 내용입니다.**"
 items = [
-  "**SSE 운영 안정화** — 화면별 중복 연결을 단일 연결로 통합하고 15초 heartbeat 추가, 배포 후 재연결 폭주 해결 → 아래 트러블슈팅 3",
   "**OAuth 안정화** — 서브도메인 콜백 인증 실패를 상위 도메인 쿠키 공유로 해결, Tomcat RFC6265 쿠키 거부로 인한 500 오류 교정",
   "**보안·운영** — DB·MinIO 자격증명을 ConfigMap에서 Secret으로 분리하고 회전 시 재기동 checksum 적용, MinIO presigned URL 외부 HTTPS 서명",
   "**인프라** — GitHub Actions 멀티아치(amd64+arm64) buildx 빌드, OCI ARM64 노드 k3s에 Helm 배포",
@@ -357,7 +356,7 @@ result = """
 """
 
 [[troubleshooting]]
-title = "3. SSE 운영 안정화 — 재연결 폭주와 다중 인스턴스 알림 누락 (수료 후 고도화)"
+title = "3. SSE 운영 안정화 — 재연결 폭주와 다중 인스턴스 알림 누락"
 problem = """
 배포 후 로그인하면 `/api/sse/connect`가 200 응답 직후 `ERR_HTTP2_PROTOCOL_ERROR`로 끊기고 곧바로 재연결을 반복했습니다. QUIC을 비활성화해도 동일해 전송 프로토콜 문제가 아니었습니다.
 
