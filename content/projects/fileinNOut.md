@@ -1,6 +1,6 @@
 +++
 title = "File in & Out"
-date = 2024-05-01
+date = 2026-04-01
 weight = 1
 slug = "fileinnout"
 category = "Collaboration · 팀 프로젝트"
@@ -21,6 +21,18 @@ features_intro = """
 monitoring_note = """
 🔎 위 관측 버튼들은 캡처 이미지가 아니라, 수료 후 직접 구축해 운영 중인 **k3s 클러스터에 읽기 전용으로 연결**됩니다. 배포 상태 · 메트릭 · 분산 트레이싱을 방문 시점 기준 실시간으로 확인할 수 있습니다.
 """
+
+[advancement]
+title = "수료 후 단독 고도화 (2026.06 ~ )"
+note = "팀 프로젝트 종료 후 개인 리포지토리로 이어받아 실제 운영 수준으로 끌어올리고 있습니다. **아래는 전부 수료 후 혼자 작업한 내용입니다.**"
+items = [
+  "**SSE 운영 안정화** — 화면별 중복 연결을 단일 연결로 통합하고 15초 heartbeat 추가, 배포 후 재연결 폭주 해결 → 아래 트러블슈팅 3",
+  "**OAuth 안정화** — 서브도메인 콜백 인증 실패를 상위 도메인 쿠키 공유로 해결, Tomcat RFC6265 쿠키 거부로 인한 500 오류 교정",
+  "**보안·운영** — DB·MinIO 자격증명을 ConfigMap에서 Secret으로 분리하고 회전 시 재기동 checksum 적용, MinIO presigned URL 외부 HTTPS 서명",
+  "**인프라** — GitHub Actions 멀티아치(amd64+arm64) buildx 빌드, OCI ARM64 노드 k3s에 Helm 배포",
+  "**관측 스택 공개** — Prometheus·Grafana·Jaeger·Kiali 직접 구축, 위 모니터링 버튼에서 읽기 전용 실시간 확인",
+  "**기능·품질** — 워크스페이스 버전 비교·복구, 파일 스트리밍 다운로드, 공개 데모 계정 + 저장 쿼터, SSE·OAuth·스토리지 회귀 테스트 작성",
+]
 
 [[monitoring_links]]
 label = "Jaeger"
@@ -122,7 +134,7 @@ body = """
 """
 
 [[troubleshooting]]
-title = "1. 데이터 일관성"
+title = "1. 동시 편집 데이터 일관성 — 병합 단위 재설계"
 problem = """
 ![동시 편집 시 사용자별로 다르게 표시된 워크스페이스 화면](images/projects/fileinnout/workspace-concurrent-view.png "사용자별 워크스페이스 화면 불일치")
 
@@ -345,20 +357,60 @@ result = """
 """
 
 [[troubleshooting]]
-title = "트러블슈팅 3. Redis 기반 동시성 제어"
+title = "3. SSE 운영 안정화 — 재연결 폭주와 다중 인스턴스 알림 누락 (수료 후 고도화)"
 problem = """
-SSE로 실시간 알림을 구현한 뒤, 배포·확장으로 백엔드 인스턴스가 여러 개(블루/그린, 스케일아웃)가 되자 문제가 드러났습니다. 한 인스턴스에서 발생한 이벤트가 **다른 인스턴스에 연결된 사용자에게는 전달되지 않았습니다.**
+배포 후 로그인하면 `/api/sse/connect`가 200 응답 직후 `ERR_HTTP2_PROTOCOL_ERROR`로 끊기고 곧바로 재연결을 반복했습니다. QUIC을 비활성화해도 동일해 전송 프로토콜 문제가 아니었습니다.
+
+동시에 블루/그린 배포와 스케일아웃으로 백엔드 인스턴스가 여러 개가 되자, 한 인스턴스에서 발생한 이벤트가 **다른 인스턴스에 연결된 사용자에게는 전달되지 않는** 문제도 드러났습니다.
 """
 cause = """
-SSE 연결과 발행 이벤트가 **각 인스턴스의 메모리 안에만** 존재했기 때문입니다. 사용자 A가 1번 인스턴스에, B가 2번 인스턴스에 연결돼 있으면 A가 만든 이벤트는 B에게 닿지 못합니다.
+- 유저당 SSE 연결이 **2개**였습니다 — 알림 화면과 워크스페이스 화면이 각자 연결을 열었습니다.
+- 서버 저장소가 `Map<userId, emitter>` **단일 키**라 두 연결이 서로 emitter를 덮어썼고, 한쪽 `onError`의 `remove(userId)`가 **다른 연결의 emitter까지 제거**해 연쇄 재연결을 만들었습니다.
+- 알림 화면이 폴리필의 `onerror`를 덮어쓰고 자체 5초 타이머로도 재연결해, 폴리필 자체 재연결과 겹치며 연결이 증식했습니다.
+- SSE는 이벤트가 없으면 바이트가 흐르지 않아, 중간 프록시가 연결을 idle로 판정해 끊기 쉬웠습니다 (heartbeat 부재).
+- `SseEmitter`는 프로세스 로컬 객체라 인스턴스 사이에서 공유되지 않습니다.
 """
 solution = """
-**Redis Pub/Sub**을 이벤트 버스로 두어 인스턴스 간 이벤트를 전파했습니다.
+**1. 단일 연결 통합** — 앱 전체에서 SSE 연결을 하나만 열고 인증 스토어가 소유합니다. 서버 이벤트는 `window` CustomEvent로 재방출해 각 화면이 구독합니다. 연결·재연결 로직은 브라우저 의존성을 주입받는 순수 모듈로 분리해 `node:test`로 검증할 수 있게 했습니다.
 
-- 각 인스턴스는 이벤트를 Redis 채널에 발행(publish)
-- 모든 인스턴스가 같은 채널을 구독(subscribe)해, 자신에게 연결된 사용자에게 다시 전달
+**2. 저장소를 (userId, connectionId) 2단계 맵으로 재설계** — 탭·화면이 여러 개여도 자신의 연결만 정확히 추가·제거합니다.
 
-덕분에 어느 인스턴스에 연결돼 있든 동일하게 알림을 받아, 다중 인스턴스 환경에서도 SSE 동시성이 보장됩니다.
+```java
+// 한 사용자가 여러 연결(탭/기기)을 열 수 있으므로 userId -> (connectionId -> emitter)
+private final ConcurrentMap<Long, ConcurrentMap<String, SseEmitter>> emitters
+        = new ConcurrentHashMap<>();
+
+public void put(Long userId, String connectionId, SseEmitter emitter) {
+    emitters.computeIfAbsent(userId, key -> new ConcurrentHashMap<>())
+            .put(connectionId, emitter);
+}
+```
+
+**3. 15초 heartbeat** — 주기적으로 SSE comment(`:ping`)를 보내 프록시의 idle 판정을 막습니다. comment 라인은 EventSource 클라이언트가 무시하므로 애플리케이션 이벤트에 영향이 없습니다.
+
+```java
+@Scheduled(fixedRate = HEARTBEAT_INTERVAL_MS) // 15초
+public void sendHeartbeat() {
+    emitterStore.forEachEmitter((userId, connectionId, emitter) -> {
+        try {
+            emitter.send(SseEmitter.event().comment("ping"));
+        } catch (IOException | IllegalStateException e) {
+            emitterStore.remove(userId, connectionId); // 끊긴 연결만 정리
+            emitter.completeWithError(e);
+        }
+    });
+}
+```
+
+**4. Redis Pub/Sub 인스턴스 중계** — 각 인스턴스가 이벤트를 Redis 채널에 발행하고, 모든 인스턴스가 같은 채널을 구독해 자신에게 연결된 사용자에게만 최종 전달합니다.
+
+![SSE 단일 연결·heartbeat·Redis 중계 적용 전후 구조](images/projects/fileinnout/sse-stabilization.svg "SSE 운영 안정화 적용 전후")
+"""
+result = """
+- 유저당 연결 1개가 유지되고, 200 직후 끊김·재연결 반복이 사라졌습니다.
+- 이벤트가 없는 구간에도 15초 heartbeat로 프록시 절단 없이 연결이 유지됩니다.
+- 블루/그린·스케일아웃 환경에서 어느 인스턴스에 연결돼도 동일하게 알림을 받습니다.
+- 동작은 `SseHeartbeatTest`, `SseEmitterStoreTest` 회귀 테스트로 고정했습니다.
 """
 +++
 

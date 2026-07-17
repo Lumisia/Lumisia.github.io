@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 928 596" font-family="Pretendard, 'Malgun Gothic', system-ui, sans-serif">
+  <rect x="0" y="0" width="928" height="596" rx="18" fill="#f4f7fd"/>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5b6674"/>
+    </marker>
+    <marker id="arr-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c9372c"/>
+    </marker>
+    <marker id="arr-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4d7ca8"/>
+    </marker>
+  </defs>
+
+  <!-- ===== BEFORE ===== -->
+  <text x="44" y="38" font-size="14" font-weight="700" fill="#c9372c">적용 전 — 화면마다 연결 · userId 단일 키 · heartbeat 없음</text>
+
+  <!-- browser box -->
+  <rect x="44" y="52" width="216" height="168" rx="10" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+  <text x="152" y="76" font-size="12.5" font-weight="700" fill="#2e3640" text-anchor="middle">브라우저 (유저 A)</text>
+  <rect x="60" y="90" width="184" height="24" rx="6" fill="#e3eefa" stroke="#a9cdec"/>
+  <text x="152" y="106" font-size="11" fill="#2e3640" text-anchor="middle">알림 화면 SSE 연결</text>
+  <rect x="60" y="124" width="184" height="24" rx="6" fill="#e3eefa" stroke="#a9cdec"/>
+  <text x="152" y="140" font-size="11" fill="#2e3640" text-anchor="middle">워크스페이스 SSE 연결</text>
+  <text x="152" y="176" font-size="10.5" fill="#c9372c" text-anchor="middle">자체 5초 타이머 + 폴리필 재연결</text>
+  <text x="152" y="192" font-size="10.5" fill="#c9372c" text-anchor="middle">→ 재연결 중복·연결 증식</text>
+
+  <!-- arrows to instance1 -->
+  <line x1="244" y1="102" x2="352" y2="102" stroke="#5b6674" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="244" y1="136" x2="352" y2="136" stroke="#5b6674" stroke-width="1.6" marker-end="url(#arr)"/>
+  <!-- proxy cut -->
+  <line x1="278" y1="66" x2="278" y2="166" stroke="#c9372c" stroke-width="1.4" stroke-dasharray="5 4"/>
+  <text x="300" y="60" font-size="10.5" fill="#c9372c" text-anchor="middle">프록시 idle 절단</text>
+
+  <!-- instance1 box -->
+  <rect x="356" y="52" width="256" height="168" rx="10" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+  <text x="484" y="76" font-size="12.5" font-weight="700" fill="#2e3640" text-anchor="middle">인스턴스 1</text>
+  <rect x="372" y="90" width="224" height="24" rx="6" fill="#f0e6fb" stroke="#cdb6ee"/>
+  <text x="484" y="106" font-size="11" fill="#2e3640" text-anchor="middle">Map&lt;userId, emitter&gt; 단일 키</text>
+  <text x="484" y="140" font-size="10.5" fill="#c9372c" text-anchor="middle">✕ 두 연결이 서로 emitter를 덮어씀</text>
+  <text x="484" y="158" font-size="10.5" fill="#c9372c" text-anchor="middle">✕ remove(userId)가 상대 연결까지 제거</text>
+  <text x="484" y="190" font-size="10.5" fill="#5b6674" text-anchor="middle">이벤트 없으면 바이트 0 → idle 판정</text>
+
+  <!-- instance2 box -->
+  <rect x="656" y="52" width="228" height="168" rx="10" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+  <text x="770" y="76" font-size="12.5" font-weight="700" fill="#2e3640" text-anchor="middle">인스턴스 2</text>
+  <rect x="672" y="90" width="196" height="24" rx="6" fill="#e3eefa" stroke="#a9cdec"/>
+  <text x="770" y="106" font-size="11" fill="#2e3640" text-anchor="middle">유저 B의 SSE 연결</text>
+  <text x="770" y="146" font-size="10.5" fill="#c9372c" text-anchor="middle">✕ 인스턴스 1의 이벤트를 못 받음</text>
+  <text x="770" y="164" font-size="10.5" fill="#5b6674" text-anchor="middle">(SseEmitter는 프로세스 로컬 메모리)</text>
+
+  <text x="44" y="248" font-size="12" fill="#5b6674">200 응답 직후 끊김과 재연결이 반복되고, 다중 인스턴스에서는 이벤트를 만든 인스턴스와 사용자가 연결된 인스턴스가 다르면 알림이 누락</text>
+
+  <!-- ===== AFTER ===== -->
+  <text x="44" y="296" font-size="14" font-weight="700" fill="#4d7ca8">적용 후 — 단일 연결 · (userId, connectionId) 복합 키 · 15초 heartbeat · Redis 중계</text>
+
+  <!-- browser box -->
+  <rect x="44" y="312" width="216" height="168" rx="10" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+  <text x="152" y="336" font-size="12.5" font-weight="700" fill="#2e3640" text-anchor="middle">브라우저 (유저 A)</text>
+  <rect x="60" y="350" width="184" height="24" rx="6" fill="#dcefe2" stroke="#9ccfae"/>
+  <text x="152" y="366" font-size="11" fill="#2e3640" text-anchor="middle">단일 SSE 연결 (스토어 소유)</text>
+  <text x="152" y="404" font-size="10.5" fill="#5b6674" text-anchor="middle">서버 이벤트를 CustomEvent로 재방출</text>
+  <text x="152" y="420" font-size="10.5" fill="#5b6674" text-anchor="middle">→ 알림·워크스페이스 화면이 구독</text>
+
+  <!-- single arrow with heartbeat -->
+  <line x1="244" y1="362" x2="352" y2="362" stroke="#4d7ca8" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+  <text x="298" y="352" font-size="10.5" fill="#4d7ca8" text-anchor="middle">:ping (15초)</text>
+
+  <!-- instance1 box -->
+  <rect x="356" y="312" width="256" height="168" rx="10" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+  <text x="484" y="336" font-size="12.5" font-weight="700" fill="#2e3640" text-anchor="middle">인스턴스 1</text>
+  <rect x="372" y="350" width="224" height="24" rx="6" fill="#f0e6fb" stroke="#cdb6ee"/>
+  <text x="484" y="366" font-size="11" fill="#2e3640" text-anchor="middle">(userId, connectionId) 2단계 맵</text>
+  <text x="484" y="400" font-size="10.5" fill="#2e3640" text-anchor="middle">탭이 여러 개여도 자기 연결만 제거</text>
+  <text x="484" y="418" font-size="10.5" fill="#2e3640" text-anchor="middle">heartbeat 실패 연결은 즉시 정리</text>
+
+  <!-- redis -->
+  <rect x="622" y="398" width="96" height="46" rx="12" fill="#ffe9e3" stroke="#e8a394"/>
+  <text x="670" y="417" font-size="11" font-weight="700" fill="#b8401f" text-anchor="middle">Redis</text>
+  <text x="670" y="432" font-size="10" fill="#b8401f" text-anchor="middle">Pub/Sub 채널</text>
+  <line x1="612" y1="392" x2="640" y2="404" stroke="#5b6674" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="702" y1="404" x2="730" y2="392" stroke="#5b6674" stroke-width="1.6" marker-end="url(#arr)"/>
+  <text x="670" y="462" font-size="10" fill="#5b6674" text-anchor="middle">발행 → 전 인스턴스 구독</text>
+
+  <!-- instance2 box -->
+  <rect x="656" y="312" width="228" height="76" rx="10" fill="#ffffff" stroke="#d2e3f2" stroke-width="1.4"/>
+  <text x="770" y="336" font-size="12.5" font-weight="700" fill="#2e3640" text-anchor="middle">인스턴스 2</text>
+  <rect x="672" y="348" width="196" height="24" rx="6" fill="#e3eefa" stroke="#a9cdec"/>
+  <text x="770" y="364" font-size="11" fill="#2e3640" text-anchor="middle">유저 B의 SSE 연결</text>
+  <text x="464" y="508" font-size="12" font-weight="700" fill="#2e7d32" text-anchor="middle">✓ 어느 인스턴스에 연결돼도 알림 수신 · 유저당 연결 1개 유지</text>
+
+  <text x="44" y="548" font-size="12" fill="#5b6674">유저당 연결 1개 유지 + 15초 comment로 프록시 절단 방지, 인스턴스 사이는 Redis 채널로 중계</text>
+  <text x="44" y="568" font-size="12" fill="#5b6674">동작은 SseHeartbeatTest · SseEmitterStoreTest 회귀 테스트로 고정</text>
+</svg>

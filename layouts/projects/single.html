@@ -88,6 +88,18 @@
       </div>
       {{- end }}
 
+      {{- with .Params.advancement }}
+      <section class="proj-advancement">
+        <h2 class="proj-sec-h">{{ .title | default "수료 후 단독 고도화" }}</h2>
+        {{- with .note }}<p class="advancement-note">{{ . | markdownify }}</p>{{- end }}
+        <ul class="proj-points advancement-points">
+          {{- range .items }}
+          <li>{{ . | markdownify }}</li>
+          {{- end }}
+        </ul>
+      </section>
+      {{- end }}
+
       <div class="project-content">
         {{ .Content }}
       </div>
