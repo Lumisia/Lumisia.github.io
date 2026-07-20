@@ -14,6 +14,14 @@ period = "2026.04 ~ 2026.05 (BEYOND SW 캠프 24기 최종 프로젝트)"
 team = "팀원 5명"
 responsibility = "캠페인 · 대시보드 · 캘린더 · KPI · Redis 담당"
 
+[[highlights]]
+value = "Redis vs Valkey"
+label = "동일 코드 대안 비교"
+
+[[highlights]]
+value = "에러 44 → 0"
+label = "100 VU 부하 기준"
+
 features_intro = """
 캠페인의 생성부터 성과 확인까지 이어지는 핵심 흐름을 담당했습니다. 화면 구현에 그치지 않고 캠페인 권한, 업무·일정 데이터, KPI 집계, 대시보드 캐시까지 프론트엔드와 백엔드를 함께 연결했습니다.
 """

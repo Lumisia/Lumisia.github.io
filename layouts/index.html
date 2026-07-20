@@ -25,7 +25,30 @@
         <div class="hero-right">
           <h2 class="hero-name">{{ site.Params.label.text }}</h2>
           <p class="hero-role-main">Backend Developer</p>
-          <p class="hero-stack">Spring Boot · Kubernetes · Websocket · Redis</p>
+          <p class="hero-stack">Spring Boot · Kubernetes · Redis/Valkey · nGrinder</p>
+
+          <div class="hero-metrics">
+            <div class="hero-metric">
+              <b>11초 → 0.8초</b>
+              <i>대시보드 평균 응답</i>
+            </div>
+            <div class="hero-metric">
+              <b>TPS 7 → 117</b>
+              <i>100 VU 부하 기준</i>
+            </div>
+            <div class="hero-metric">
+              <b>에러 44 → 0</b>
+              <i>동일 시나리오 재측정</i>
+            </div>
+          </div>
+
+          <p class="hero-pitch">개선 전·후, 그리고 <b>대안까지</b> 측정해서 검증합니다. 같은 코드로 Redis와 Valkey를 비교 측정했고, 모든 성능 주장 뒤에는 nGrinder 리포트가 있습니다.</p>
+
+          <div class="hero-cta">
+            <a class="hero-cta-btn hero-cta-btn--primary" href="{{ (site.GetPage "/projects/callog").RelPermalink }}#troubleshooting">측정 리포트 보기</a>
+            <a class="hero-cta-btn" href="{{ site.Params.githubURL }}" target="_blank" rel="noopener">GitHub</a>
+          </div>
+
           <div class="hero-tags">
             <span class="hero-tag">성능을 고려하는 개발자</span>
             <span class="hero-tag">이벤트 기반 아키텍처 설계</span>
@@ -88,6 +111,17 @@
             <h3 class="tile-title">{{ .Title }}</h3>
             <p class="tile-sum">{{ .Params.summary }}</p>
             <span class="tile-btn">자세히 보기</span>
+          </div>
+          <div class="tile-always">
+            <span class="tile-always-cat">{{ .Params.category }}</span>
+            <h3 class="tile-always-title">{{ .Title }}</h3>
+            {{- with .Params.highlights }}
+            <div class="tile-metrics">
+              {{- range . }}
+              <span class="tile-metric"><b>{{ .value }}</b><i>{{ .label }}</i></span>
+              {{- end }}
+            </div>
+            {{- end }}
           </div>
         </a>
         {{- end }}

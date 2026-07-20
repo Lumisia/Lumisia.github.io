@@ -5,6 +5,7 @@ title = "최재원 | Backend Developer"
 theme = "PaperMod"
 
 [params]
+  description = "개선 전·후, 그리고 대안까지 측정해서 검증하는 백엔드 개발자. 대시보드 응답 11초 → 0.8초, TPS 7 → 117. Spring Boot · Kubernetes · Redis/Valkey · nGrinder."
   defaultTheme = "light"
   disableThemeToggle = true
   githubUser = "Lumisia"

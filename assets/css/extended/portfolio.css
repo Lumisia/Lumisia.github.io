@@ -339,7 +339,48 @@ body > .main {
  .hero-name { font-size: 62px; font-weight: 800; letter-spacing: -1.6px; line-height: 1.08; }
  .hero-role-main { margin-top: 12px; font-size: 18px; font-weight: 700; color: var(--blue-deep); }
  .hero-stack { margin-top: 5px; font-family: var(--font-mono); font-size: 13.5px; letter-spacing: 0.2px; color: var(--ink-dim); }
- .hero-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+ /* 첫 화면 실측 지표 — 스크롤 전에 수치를 먼저 보여준다 */
+ .hero-metrics {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;
+ }
+ .hero-metric {
+  flex: 1 1 150px; min-width: 150px;
+  padding: 11px 14px;
+  background: var(--card);
+  border: 1px solid var(--blue-hair);
+  border-left: 3px solid var(--blue-deep);
+  border-radius: 10px;
+ }
+ .hero-metric b {
+  display: block;
+  font-size: 17px; font-weight: 750; letter-spacing: -0.3px;
+  color: var(--blue-deep);
+ }
+ .hero-metric i {
+  display: block; margin-top: 3px;
+  font-style: normal; font-size: 11.5px; font-weight: 400;
+  color: var(--ink-dim);
+ }
+ .hero-pitch {
+  margin-top: 16px; max-width: 700px;
+  font-size: 15px; line-height: 1.8; color: var(--ink);
+ }
+ .hero-pitch b { font-weight: 740; color: var(--blue-deep); }
+ .hero-cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+ .hero-cta-btn {
+  display: inline-flex; align-items: center;
+  padding: 9px 20px; border-radius: 50px;
+  font-size: 13.5px; font-weight: 550;
+  border: 1px solid var(--blue-hair); color: var(--blue-deep);
+  background: var(--card);
+  transition: transform 120ms ease, opacity 120ms ease;
+ }
+ .hero-cta-btn--primary {
+  background: var(--blue-deep); border-color: var(--blue-deep); color: #fff;
+ }
+ .hero-cta-btn:hover { opacity: 0.86; transform: translateY(-1px); }
+ .hero-cta-btn:active { transform: scale(0.98); }
+ .hero-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 22px; }
  .hero-tag {
   display: inline-flex; align-items: center;
   background: var(--blue-soft); color: var(--blue-deep);
@@ -419,6 +460,41 @@ body > .main {
  }
  .tile-btn:hover { opacity: 0.8; }
  .tile-btn:active { transform: scale(0.97); }
+ /* 카드 하단 상시 노출 영역 — 오버레이는 hover에만 뜨므로 제목·수치는 항상 보이게 둔다 */
+ .tile-always {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+  padding: 14px 12px 11px;
+  background: linear-gradient(to top, rgba(17,22,28,0.88), rgba(17,22,28,0.55) 62%, rgba(17,22,28,0));
+  pointer-events: none;
+  transition: opacity 160ms ease;
+ }
+ .proj-tile:hover .tile-always,
+ .proj-tile:focus-within .tile-always { opacity: 0; }
+ .tile-always-cat {
+  display: block;
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 500;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: rgba(255,255,255,0.78);
+ }
+ .tile-always-title {
+  margin: 3px 0 8px;
+  font-size: 16px; font-weight: 700; letter-spacing: -0.2px; color: #fff;
+ }
+ .tile-metrics {
+  display: flex; gap: 8px; flex-wrap: wrap;
+ }
+ .tile-metric {
+  display: inline-flex; align-items: baseline; gap: 5px;
+  padding: 4px 10px; border-radius: 50px;
+  background: rgba(255,255,255,0.94);
+  box-shadow: 0 1px 4px rgba(17,22,28,0.18);
+ }
+ .tile-metric b {
+  font-size: 12px; font-weight: 700; color: var(--blue-deep); letter-spacing: -0.1px;
+ }
+ .tile-metric i {
+  font-style: normal; font-size: 10.5px; font-weight: 400; color: #5b6674;
+ }
 
 /* ── 프로젝트 상세 공통 ── */
  .modal { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 24px; }
