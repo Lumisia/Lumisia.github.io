@@ -27,20 +27,24 @@
           <p class="hero-role-main">Backend Developer</p>
           <p class="hero-stack">Spring Boot · Kubernetes · Redis/Valkey · nGrinder</p>
 
-          <div class="hero-metrics">
-            <div class="hero-metric">
-              <b>11초 → 0.8초</b>
-              <i>대시보드 평균 응답</i>
+          {{- $metrics := slice
+            (dict "cap" "대시보드 평균 응답" "from" "11초"  "to" "0.8초" "note" "100 VU · nGrinder")
+            (dict "cap" "처리량 TPS"         "from" "7"     "to" "117"   "note" "Redis → Valkey 재측정")
+            (dict "cap" "요청 에러"          "from" "44건"  "to" "0건"   "note" "동일 시나리오")
+          -}}
+          <dl class="metric-strip">
+            {{- range $i, $m := $metrics }}
+            <div class="metric" style="--i:{{ $i }}">
+              <dt class="metric-cap">{{ $m.cap }}</dt>
+              <dd class="metric-val">
+                <span class="metric-from">{{ $m.from }}</span>
+                <span class="metric-track" aria-hidden="true"></span>
+                <span class="metric-to">{{ $m.to }}</span>
+              </dd>
+              <p class="metric-note">{{ $m.note }}</p>
             </div>
-            <div class="hero-metric">
-              <b>TPS 7 → 117</b>
-              <i>100 VU 부하 기준</i>
-            </div>
-            <div class="hero-metric">
-              <b>에러 44 → 0</b>
-              <i>동일 시나리오 재측정</i>
-            </div>
-          </div>
+            {{- end }}
+          </dl>
 
           <p class="hero-pitch">개선 전·후, 그리고 <b>대안까지</b> 측정해서 검증합니다. 같은 코드로 Redis와 Valkey를 비교 측정했고, 모든 성능 주장 뒤에는 nGrinder 리포트가 있습니다.</p>
 
