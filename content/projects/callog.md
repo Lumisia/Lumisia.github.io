@@ -1,4 +1,5 @@
 +++
+
 title = "Callog"
 date = 2026-05-29
 weight = 2
@@ -106,236 +107,144 @@ body = """
 """
 
 [[troubleshooting]]
-title = "1. 대시보드 조회 병목 - JPA 전수 조회와 캐시 미적용 개선"
-problem = """
-대시보드 한 화면에서 캠페인, KPI, 협력사, 업무, 자산 데이터를 함께 집계했습니다. 초기 구현은 테이블 전체를 조회한 뒤 Java Stream으로 권한 범위를 필터링했고, 캠페인별 참여자와 KPI를 반복 조회했습니다.
+title = "1. 대시보드에서 조회 지연으로 데이터가 표시되지 않거나 일부만 표시되는 문제가 있었습니다."
+architecture_image = "images/projects/callog/dashboard-architecture.svg"
+architecture_alt = "대시보드에서 조회 지연으로 데이터가 표시되지 않거나 일부만 표시되는 문제가 있었습니다. 기능 전체 흐름"
+cause = '''
+1. 기능을 기초 구현한 뒤 대시보드에 진입했을 때 데이터가 표시되지 않거나 일부 영역만 표시되는 현상을 발견했습니다.
+2. 전체 데이터를 가져와 가공하는 비용과 캠페인별 반복 조회로 응답이 지연됐으며, 같은 객체 내부에서 집계 메서드를 호출해 Spring 프록시를 거치지 않으면서 `@Cacheable`도 적용되지 않았습니다.
+3. 프론트 요청 제한 시간만 늘려서는 처리 비용이 줄어들지 않으므로, 조회 범위와 실제 캐시가 적용되는 호출 위치를 함께 바꿔야 했습니다.
+'''
+solution = '''
+- 전체 조회 후 Java에서 가공하던 처리를 조건에 맞는 `IN` 조회와 `COUNT`, `GROUP BY` 집계 쿼리로 변경했습니다.
+- 외부에서 호출되는 `loadAll()`에 `@Cacheable`을 적용하고 사용자, 기간, 버전으로 키를 구성해 통합 응답을 재사용하며 데이터 변경 시 해당 사용자의 버전을 갱신했습니다.
+- 프론트 대기 시간을 늘리는 방법보다 백엔드의 조회량과 반복 계산을 줄이는 방법을 선택했습니다.
+- 쿼리와 캐시 개선 후 같은 애플리케이션 코드에서 접속 호스트를 바꿔 Valkey를 비교했으며, 해당 시나리오의 추가 개선과 간단한 전환 과정을 바탕으로 채택했습니다.
 
-```java
-// 적용 전: 전체 테이블 조회 후 JVM에서 필터링
-List<CampaignKpi> kpis = campaignKpiRepository.findAll().stream()
-    .filter(kpi -> visibleCampaignIds.contains(kpi.getCampaign().getIdx()))
-    .toList();
+**실제 조건 조회와 집계 쿼리 발췌**
 
-for (Campaign campaign : visibleCampaigns) {
-    participantRepository.findAllByCampaignIdx(campaign.getIdx());
-}
+~~~java
+List<CampaignKpi> kpis = visibleCampaignIds.isEmpty()
+        ? List.of()
+        : campaignKpiRepository.findAllByCampaign_IdxInOrderByIdxAsc(visibleCampaignIds);
 
-long liveAssets = assetRepository.findAll().stream()
-    .filter(asset -> isVisible(asset, scope))
-    .count();
-```
+@Query("SELECT COUNT(a) FROM MarketingAsset a " +
+       "WHERE (a.campaign.idx IN :campaignIds) " +
+       "   OR (:ownerOrgId IS NOT NULL AND a.organization.idx = :ownerOrgId)")
+long countVisibleAssets(
+        @Param("campaignIds") Collection<Long> campaignIds,
+        @Param("ownerOrgId") Long ownerOrgId);
+~~~
 
-100 Vuser가 2분 동안 대시보드 통합 조회를 호출한 결과 TPS는 **7.0**, 평균 응답 시간은 **11,033.33ms**, 에러는 **44건**이었습니다.
+**통합 API가 호출하는 메서드에 캐시 적용**
 
-![JPA 쿼리 최적화와 Redis 캐시 적용 전 nGrinder 결과](images/projects/callog/dashboard-before.png "대시보드 최적화 적용 전")
-"""
-cause = """
-- `findAll()`은 사용자에게 필요하지 않은 행까지 애플리케이션 메모리로 가져왔습니다.
-- 캠페인 반복문 안의 참여자·KPI 조회가 캠페인 수에 비례해 증가했습니다.
-- 하위 집계 메서드에 `@Cacheable`이 있어도 같은 객체의 `loadAll()`에서 직접 호출하면 Spring AOP Proxy를 우회해 캐시가 적용되지 않았습니다.
-- 동시에 Cold Cache가 열리면 같은 키를 여러 요청이 계산하는 Cache Stampede 가능성이 있었습니다.
-"""
-solution = """
-**1. 조회 범위를 DB 쿼리로 이동**
+같은 객체 내부의 하위 메서드 호출에 의존하던 구조를 바꿔, 통합 응답을 반환하는 진입 지점에 캐시를 적용했습니다. 다음은 해당 캐시 선언입니다.
 
-```java
-// 적용 후: 필요한 캠페인 범위만 IN 쿼리로 조회
-List<CampaignKpi> kpis = campaignKpiRepository
-    .findAllByCampaign_IdxInOrderByIdxAsc(visibleCampaignIds);
-
-List<CampaignParticipant> participants = participantRepository
-    .findAllByCampaignIdxInWithOrg(visibleCampaignIds);
-
-long liveAssets = assetRepository
-    .countVisibleAssets(visibleCampaignIds, scope.ownerOrgId());
-```
-
-전수 조회와 캠페인별 반복 쿼리를 `IN`, `COUNT`, `GROUP BY` 기반 Repository 쿼리로 변경했습니다.
-
-**2. 통합 응답 자체를 캐시**
-
-```java
+~~~java
 private static final String DASHBOARD_VERSION_KEY =
-    " + ':v' + @dashboardCacheVersionService.getVersion(#callerIdx)";
+        " + ':v' + @dashboardCacheVersionService.getVersion(#callerIdx)";
 
-@Cacheable(
-    value = CacheNames.DASHBOARD_PAGE,
-    key = "#callerIdx + ':' + (#periodCode == null ? '' : #periodCode)"
-          + DASHBOARD_VERSION_KEY,
-    sync = true
-)
-public DashboardPageDto loadAll(Long callerIdx, String periodCode) {
-    return new DashboardPageDto(
-        summary(callerIdx), quarterGoals(callerIdx, periodCode),
-        partnerProgress(callerIdx), assetCategories(callerIdx)
-    );
-}
-```
+@Cacheable(value = CacheNames.DASHBOARD_PAGE,
+        key = "#callerIdx + ':' + (#periodCode == null ? '' : #periodCode)" + DASHBOARD_VERSION_KEY,
+        sync = true)
+~~~
+'''
+result = '''
+쿼리와 캐시를 개선한 뒤 평균 테스트 시간이 약 11초에서 787.35ms로 줄었고, 처리량은 7.0 TPS에서 117.4 TPS로 증가했습니다. 같은 대시보드 조회 시나리오의 최종 측정에서 오류가 44건에서 0건으로 줄어, 데이터 조회 실패와 긴 응답 대기를 개선했습니다.
 
-사용자·분기·버전 단위 키로 `loadAll()` 결과를 Redis에 저장했습니다. 동일 키의 최초 계산은 한 스레드만 수행하고, 데이터 변경 시 해당 사용자의 버전만 증가시켰습니다.
+7.0에서 97.3 TPS까지는 쿼리와 캐시를 함께 개선한 결과이며, 이후 Valkey 전환 측정에서 117.4 TPS를 기록했습니다. Valkey 선택은 이 반복 조회 시나리오의 결과와 전환 비용을 기준으로 판단했습니다.
 
-![JPA 쿼리 최적화와 Redis 캐시 적용 후 nGrinder 결과](images/projects/callog/dashboard-redis.png "대시보드 Redis 적용 후")
+테스트 조건: 최대 가상 사용자 100명, 실행 시간 약 2분, 관련 데이터 합계 약 1,000건, 동일 계정 반복 호출, 시작 전 캐시 초기화, Ramp-Up 적용.
 
-**3. Redis에서 Valkey로 비교 전환**
-
-```yaml
-spring:
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: 6379
-```
-
-Valkey가 Redis 프로토콜과 Lettuce 연결 방식을 호환하므로 애플리케이션 코드는 유지하고 ConfigMap의 접속 호스트만 교체했습니다.
-
-![Redis에서 Valkey로 전환한 뒤 nGrinder 결과](images/projects/callog/dashboard-valkey.png "대시보드 Valkey 적용 후")
-"""
-result = """
-| 구분 | 평균 TPS | 평균 응답 시간 | 에러 |
+| 항목 | 개선 전 | 쿼리 최적화 + Redis | 동일 코드 + Valkey |
 |---|---:|---:|---:|
-| JPA·Redis 최적화 전 | 7.0 | 11,033.33ms | 44 |
-| JPA 쿼리 최적화 + Redis | 97.3 | 995.14ms | 16 |
-| 동일 코드 + Valkey | 117.4 | 787.35ms | 0 |
+| TPS | 7.0 | 97.3 | 117.4 |
+| 평균 테스트 시간 | 11,033.33ms | 995.14ms | 787.35ms |
+| 오류 | 44 | 16 | 0 |
 
-- JPA 쿼리 최적화와 Redis 적용 후 TPS가 **약 13.9배 증가**하고 평균 응답 시간이 **약 91.0% 감소**했습니다.
-- Valkey 전환 후 기록에서는 TPS **117.4**, 평균 응답 **787.35ms**, 에러 **0건**을 확인했습니다.
-- 첫 번째와 두 번째 결과는 JPA와 캐시를 함께 개선한 결과이므로 Redis만의 효과로 분리해 해석하지 않았습니다.
-- Redis와 Valkey는 워밍업과 자원 경합 조건이 완전히 같지 않아 제품 간 우열이 아니라 **호환 전환과 운영 가능성 검증**으로 판단했습니다.
-"""
+**개선 전**
+
+![대시보드 조회 개선 전 성능 측정](images/projects/callog/dashboard-before.png)
+
+**Redis 적용 단계**
+
+![대시보드 Redis 적용 후 성능 측정](images/projects/callog/dashboard-redis.png)
+
+**Valkey 적용 단계**
+
+![대시보드 Valkey 적용 후 성능 측정](images/projects/callog/dashboard-valkey.png)
+'''
 
 [[troubleshooting]]
-title = "2. 다일정 중복·겹침 - 주 단위 레인 배치로 캘린더 재설계"
-problem = """
-초기 월간 캘린더는 날짜 셀마다 해당 일자의 이벤트를 독립적으로 렌더링했습니다. 여러 날짜에 걸친 캠페인과 업무는 매일 별도 칩으로 반복되어 기간의 연속성이 보이지 않았고, 같은 날 일정이 몰리면 셀 높이가 불안정해졌습니다.
+title = "2. 캘린더에서 기간 일정이 반복 표시되고 다른 일정을 가리는 문제가 있었습니다."
+architecture_image = "images/projects/callog/calendar-architecture.svg"
+architecture_alt = "캘린더에서 기간 일정이 반복 표시되고 다른 일정을 가리는 문제가 있었습니다. 기능 전체 흐름"
+cause = '''
+1. 여러 임시 더미 일정을 넣어 확인하면서, 기간 일정이 반복 표시되고 다른 1일 또는 3일 일정이 보이지 않는 현상을 발견했습니다.
+2. 날짜 셀마다 일정을 독립적으로 표시해 옆 날짜까지 이어지는 일정의 점유 구간을 함께 계산하지 못했고, 표시 개수를 제한하면서 다른 일정이 가려졌습니다.
+3. 일정이 같은 날짜에 몰려도 각각의 기간과 존재를 확인할 수 있도록 주 단위로 표시 구간과 겹침을 계산해야 했습니다.
+'''
+solution = '''
+- 시작일과 종료일을 기준으로 주차별 표시 구간을 계산해 긴 일정을 이어진 막대로 표시했습니다.
+- 한 주에서 날짜 구간이 겹치는 일정은 서로 다른 줄에 배치했습니다.
+- 화면에는 최대 4줄을 표시하고 초과 일정은 날짜별 `+N`과 상세 목록으로 확인할 수 있게 했습니다.
+- 긴 일정과 같은 날짜의 짧은 일정이 모두 눈에 들어와야 한다는 요구에 맞춰, 기간 구간과 줄 배치를 함께 계산하는 방식을 선택했습니다.
 
-```javascript
-// 적용 전: 날짜별 이벤트를 각 셀 안에 반복 렌더링
-function visibleEventsOnDay(date) {
-  const events = eventsByDay.value.get(date) ?? []
-  return events.slice(0, MAX_ROWS_PER_DAY - 1)
-}
-```
-"""
-cause = """
-날짜 셀을 렌더링 단위로 사용하면 시작일과 종료일을 가진 하나의 이벤트도 날짜마다 서로 다른 요소가 됩니다. 또한 각 셀은 옆 날짜의 이벤트 점유 영역을 알 수 없어 다일정의 연결과 겹침을 계산할 수 없었습니다.
-"""
-solution = """
-렌더링 단위를 날짜에서 **주(7일)** 로 올리고, 이벤트를 `[startCol, endCol]` 구간으로 변환했습니다. 구간이 겹치지 않는 가장 낮은 레인을 찾아 배치하고 표시 한도를 넘는 일정은 날짜별 `+N`으로 집계했습니다.
+**겹치지 않는 가장 낮은 줄을 찾는 실제 배치 코드**
 
-```javascript
-const inWeek = events.value
-  .filter((event) => overlaps(event, weekStart, weekEnd))
-  .map((event) => ({
-    event,
-    startCol: toWeekColumn(event.start, weekStart),
-    endCol: toWeekColumn(event.end ?? event.start, weekStart),
-  }))
+주차별로 계산한 `[startCol, endCol]` 구간이 이미 배치된 일정과 겹치면 다음 줄을 검사합니다.
 
+~~~javascript
 const lanes = []
-for (const item of inWeek) {
-  let lane = 0
-  while (lanes[lane]?.some(([start, end]) =>
-    !(item.endCol < start || item.startCol > end))) lane++
-
-  ;(lanes[lane] ??= []).push([item.startCol, item.endCol])
-  item.lane = lane
+for (const it of inWeek) {
+  let L = 0
+  while (lanes[L] && lanes[L].some((seg) => !(it.endCol < seg[0] || it.startCol > seg[1]))) L++
+  if (!lanes[L]) lanes[L] = []
+  lanes[L].push([it.startCol, it.endCol])
+  it.lane = L
 }
-```
+~~~
+'''
+result = '''
+기간 일정이 날짜마다 중복 표시되던 문제를 주차별 막대 표시로 개선했습니다. 긴 일정과 짧은 일정이 같은 날짜에 있어도 줄을 나눠 구분할 수 있고, 표시 공간을 넘은 일정은 `+N`을 통해 전체 목록에서 확인할 수 있도록 했습니다.
 
-```vue
-<button
-  v-for="item in week.items"
-  :style="{
-    top: itemTop(item) + 'px',
-    left: 'calc(' + itemLeftPct(item) + '% + 4px)',
-    width: 'calc(' + itemWidthPct(item) + '% - 8px)',
-  }"
->
-```
-
-![날짜 셀별 반복 렌더와 주 단위 레인 배치 비교](images/projects/callog/calendar-lane.svg "캘린더 레인 배치 적용 전후")
-"""
-result = """
-- 여러 날짜에 걸친 일정이 하나의 연속 막대로 표시됩니다.
-- 겹치는 일정은 서로 다른 레인에 배치되어 가려지지 않습니다.
-- 표시 가능한 레인을 초과하면 날짜별 `+N`으로 접어 셀 높이를 일정하게 유지합니다.
-- 기존 클릭, Drag & Drop, Hover 상세 기능을 주 단위 오버레이에서도 그대로 유지했습니다.
-"""
+![기간 막대와 일정 배치를 확인할 수 있는 Callog 캘린더](images/projects/callog/calendar.png)
+'''
 
 [[troubleshooting]]
-title = "3. 다중 Pod 스케줄러 중복 실행과 SSE 전달 누락"
-problem = """
-Kubernetes에서 애플리케이션 Pod가 여러 개 실행되면 모든 Pod가 같은 `@Scheduled` 메서드를 수행합니다. KPI 스냅샷이 중복 생성될 수 있고, SSE 연결은 각 Pod 메모리에만 존재해 이벤트를 만든 Pod와 사용자가 연결된 Pod가 다르면 알림이 전달되지 않았습니다.
+title = "3. 다중 Pod 환경에서 스케줄러가 같은 작업을 중복 실행할 수 있었습니다."
+architecture_image = "images/projects/callog/scheduler-architecture.svg"
+architecture_alt = "다중 Pod 환경에서 스케줄러가 같은 작업을 중복 실행할 수 있었습니다. 기능 전체 흐름"
+cause = '''
+1. 이전 File in & Out 프로젝트에서 백엔드 Pod마다 스케줄러가 독립적으로 실행되는 문제를 경험했고, 같은 문제가 생기지 않도록 Callog 설계에 반영했습니다.
+2. 서버 내부 스케줄러는 다른 Pod의 작업 실행을 알 수 없고, 사용자 알림 연결도 각 Pod에 따로 존재했습니다.
+3. 여러 서버가 같은 작업에 동시에 진입하는 것을 제어하면서, 작업 결과 알림은 사용자가 연결된 서버까지 전달해야 했습니다.
+'''
+solution = '''
+- Redis의 `setIfAbsent`와 TTL로 공유 락을 획득한 실행만 작업을 진행하고, 획득에 실패한 실행은 건너뛰도록 했습니다.
+- TTL이 끝난 이전 작업이 새 작업의 락을 삭제하지 않도록, UUID 토큰을 저장하고 Lua에서 값이 일치할 때만 해제했습니다.
+- 결과 알림은 Redis Pub/Sub으로 각 Pod에 전달하고, 각 Pod가 자신에게 연결된 SSE 사용자에게 전송하도록 구성했습니다.
+- 이전 프로젝트의 문제 경험을 바탕으로 작업 실행 경쟁은 Redis 락으로 제어하고, 서버 간 알림 전달은 Pub/Sub으로 처리했습니다.
 
-```java
-// 적용 전: 모든 Pod가 같은 시간에 실행
-@Scheduled(cron = "0 30 2 * * *")
-public void rollupDaily() {
-    saveDailySnapshots();
-}
+**실제 락 획득과 소유 토큰 확인 코드**
 
-// 적용 전: 현재 Pod 메모리의 연결에만 전달
-private final Map<Long, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
-```
-"""
-cause = """
-- Spring Scheduler는 다른 Pod의 실행 상태를 알지 못합니다.
-- `SseEmitter`는 프로세스 로컬 객체라 Pod 사이에서 공유할 수 없습니다.
-- 단순 Redis `DEL`로 락을 해제하면 TTL 만료 후 다른 Pod가 획득한 락까지 이전 작업이 삭제할 수 있습니다.
-"""
-solution = """
-**1. UUID 토큰을 검증하는 Redis 분산 락**
-
-```java
+~~~java
 public String tryLock(String key, Duration ttl) {
     String token = UUID.randomUUID().toString();
-    Boolean acquired = redis.opsForValue().setIfAbsent(key, token, ttl);
-    return Boolean.TRUE.equals(acquired) ? token : null;
+    Boolean isOk = redis.opsForValue().setIfAbsent(key, token, ttl);
+    return Boolean.TRUE.equals(isOk) ? token : null;
 }
 
 private static final String UNLOCK_LUA =
-    "if redis.call('get', KEYS[1]) == ARGV[1] " +
-    "then return redis.call('del', KEYS[1]) else return 0 end";
-```
+        "if redis.call('get', KEYS[1]) == ARGV[1] " +
+        "then return redis.call('del', KEYS[1]) else return 0 end";
+~~~
 
-```java
-@Scheduled(cron = "0 30 2 * * *")
-public void rollupDaily() {
-    String token = redisLock.tryLock("lock:snapshot:daily", Duration.ofMinutes(10));
-    if (token == null) return;
-    try {
-        saveDailySnapshots();
-    } finally {
-        redisLock.unLock("lock:snapshot:daily", token);
-    }
-}
-```
-
-**2. Redis Pub/Sub을 통한 SSE 중계**
-
-```java
-private void publish(SseMessage message) {
-    redis.convertAndSend("sse:events", objectMapper.writeValueAsString(message));
-}
-
-public void deliverLocally(SseMessage message) {
-    List<SseEmitter> localConnections = emitters.get(message.userIdx());
-    if (localConnections == null) return;
-    localConnections.forEach(emitter ->
-        sendEvent(message.userIdx(), emitter, message.eventName(), message.data()));
-}
-```
-
-각 Pod가 같은 채널을 구독하고 자신에게 연결된 사용자에게만 최종 전달하도록 구성했습니다.
-
-![다중 Pod 분산 락과 Redis Pub/Sub 기반 SSE 중계 시퀀스](images/projects/callog/multipod-sequence.svg "다중 Pod 상태 조정 흐름")
-"""
-result = """
-- 여러 Pod가 동시에 스케줄 시각을 맞아도 락을 획득한 한 Pod만 KPI 스냅샷을 생성합니다.
-- Lua Script가 락 소유 토큰을 비교해 다른 Pod가 획득한 락을 잘못 해제하지 않습니다.
-- 이벤트 발생 Pod와 사용자 연결 Pod가 달라도 Redis 채널을 거쳐 SSE 이벤트가 전달됩니다.
-- Redis 발행에 실패하면 현재 Pod의 로컬 연결에는 직접 전달하는 fallback을 유지했습니다.
-"""
+토큰 비교와 삭제를 Lua 안에서 함께 수행해 비교 직후 락 소유자가 바뀌는 틈을 없앴습니다.
+'''
+result = '''
+여러 Pod가 같은 작업의 락을 동시에 획득하려 할 때, 락을 얻은 실행만 작업에 진입하고 나머지는 건너뛰도록 했습니다. 작업 결과는 Pub/Sub으로 각 Pod에 전달하여 다른 서버에 연결된 사용자에게도 알림을 보낼 수 있게 했습니다. 이 방식은 락이 유지되는 동안의 실행 경쟁을 제어합니다.
+'''
 +++
 
 <section class="proj-tech-section">

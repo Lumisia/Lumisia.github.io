@@ -1,4 +1,5 @@
 +++
+
 title = "File in & Out"
 date = 2026-04-01
 weight = 1
@@ -142,284 +143,170 @@ body = """
 """
 
 [[troubleshooting]]
-title = "1. 동시 편집 데이터 일관성 — 병합 단위 재설계"
-problem = """
-![동시 편집 시 사용자별로 다르게 표시된 워크스페이스 화면](images/projects/fileinnout/workspace-concurrent-view.png "사용자별 워크스페이스 화면 불일치")
+title = "1. 실시간 문서 편집 기능에서 변경 내용이 누락되고 문서 전체가 깜빡이는 문제가 있었습니다."
+architecture_image = "images/projects/fileinnout/editor-architecture.svg"
+architecture_alt = "실시간 문서 편집 기능에서 변경 내용이 누락되고 문서 전체가 깜빡이는 문제가 있었습니다. 기능 전체 흐름"
+cause = '''
+1. 다른 사람과 기능 테스트를 할 때 문서의 변경 내용이 제대로 반영되지 못한 현상을 발견했고, 직접 두 브라우저로 추가 확인하면서 문서 전체가 깜빡이는 현상도 확인했습니다.
+2. 문서 JSON 전체를 하나의 공유 값으로 매번 교체하다보니 원격 변경을 받을 때 에디터 전체를 다시 그렸습니다.
+3. 다른 사용자의 편집 내용을 보존하면서 화면을 안정적으로 유지하려면 공유 데이터와 화면 갱신의 단위를 함께 줄여야 했습니다.
+'''
+solution = '''
+- 문서 JSON 전체를 공유하던 구조를 `Y.Array<Y.Map>` 기반의 블록 목록으로 변경했습니다.
+- 블록 ID로 변경을 구분해 해당 블록만 화면에 반영하고, 마지막 동기화 값과 달라진 로컬 편집은 원격 변경으로 덮이지 않게 보호했습니다.
+- 문자 또는 문장 단위 병합도 고려했지만, 노션처럼 블록 중심으로 편집하는 사용 경험과 당시 구현 여건에 맞춰 블록 단위를 선택했습니다.
+- 기존 자동 테스트 파일을 실행해 서로 다른 블록의 동시 수정, 블록 추가와 삭제, 순서 변경, 전송 전 로컬 편집 보존을 확인했습니다.
 
-워크스페이스는 여러 사용자가 하나의 문서를 동시에 편집하는 기능입니다. 초기 구현은 Editor.js 문서 **전체를 하나의 String으로 DB에 저장**하는 방식이었습니다.
+**변경된 블록 탐지 → 기존 Y.Map 수정 → 해당 화면 블록 갱신**
 
-이 방식은 편집 도중 다른 사용자가 먼저 저장하거나 다른 블록을 수정하면, 최종적으로 **마지막에 저장한 사용자의 값으로 덮어써질** 뿐 아니라 사용자마다 보이는 값이 서로 달라지는 문제가 있었습니다.
-"""
-cause = """
-핵심 원인은 CRDT 사용 여부와 별개로 **병합 단위를 문서 전체로 설정한 데이터 모델**이었습니다.
+먼저 블록 ID로 이전 내용과 비교해 수정할 블록을 찾습니다. 아래는 실제 `diffBlocks`에서 수정 연산을 만드는 부분이며, 추가와 삭제 및 순서 변경은 별도 분기에서 처리합니다.
 
-Yjs는 동일한 공유 타입에 들어온 변경을 결정론적으로 병합합니다. 그러나 문서 전체를 하나의 문자열로 저장하면 Yjs가 인식하는 변경 단위도 문서 전체가 됩니다. 또한 원격 변경을 받을 때마다 `editor.render()`로 문서 전체를 다시 렌더링해, 변경되지 않은 블록까지 교체되면서 입력 흐름과 커서가 흔들렸습니다.
+~~~javascript
+function blockChanged(o, n) {
+  return o.type !== n.type || JSON.stringify(o.data) !== JSON.stringify(n.data)
+}
 
-| 방식 | 판단 |
-|---|---|
-| 편집 잠금 | 데이터 충돌은 막지만 한 명만 편집할 수 있어 실시간 협업 목적과 맞지 않음 |
-| Last Write Wins | 구현은 간단하지만 늦게 도착한 전체 문서가 다른 사용자의 변경을 덮어씀 |
-| OT | 중앙 서버에서 연산 순서와 변환 규칙을 관리해야 하며 블록 추가·삭제·이동까지 처리가 복잡함 |
-| CRDT | 각 클라이언트가 독립적으로 수정해도 변경 연산을 병합하고 동일한 상태로 수렴 가능 |
-"""
-solution = """
-**CRDT(Yjs)** 를 채택하고 병합 단위를 문서 전체가 아니라 **블록 단위**로 재설계했습니다.
+const oldById = new Map(oldList.map((b) => [b.id, b]))
 
-```javascript
-export function yMapToBlock(ymap) {
-  return {
-    id: ymap.get('id'),
-    type: ymap.get('type'),
-    data: ymap.get('data'),
+for (const n of newList) {
+  const o = oldById.get(n.id)
+  if (o && blockChanged(o, n)) {
+    ops.push({ type: 'update', id: n.id, block: n })
   }
 }
+~~~
 
-export function yArrayToBlocks(yArray) {
-  const out = []
+찾아낸 변경은 문서 전체를 교체하지 않고 해당 블록의 기존 `Y.Map`에 적용합니다. 서로 다른 블록을 수정하면 각각의 공유 객체에 변경이 기록됩니다.
 
-  for (let i = 0; i < yArray.length; i++) {
-    out.push(yMapToBlock(yArray.get(i)))
-  }
+~~~javascript
+const m = yArray.get(i)
+if (m.get('type') !== op.block.type) m.set('type', op.block.type)
+m.set('data', op.block.data)
+~~~
 
-  return out
-}
+화면에도 같은 수정 연산을 적용해 해당 Editor.js 블록만 갱신합니다.
 
-function blockToYMap(Y, block) {
-  const m = new Y.Map()
-  m.set('id', block.id)
-  m.set('type', block.type)
-  m.set('data', block.data)
-  return m
-}
-```
+~~~javascript
+await blocksApi.update(op.block.id, op.block.data)
+~~~
+'''
+result = '''
+서로 다른 블록을 동시에 편집할 때 변경 내용이 누락되던 문제를 해결했습니다. 수정한 내용은 두 편집 화면에 함께 반영되고, 변경된 블록만 갱신하도록 하여 문서 전체를 다시 그리면서 발생하던 깜빡임을 개선했습니다.
 
-![블록 단위로 이전 데이터와 현재 데이터를 추적하는 화면](images/projects/fileinnout/block-change-tracking.png "블록 변경 데이터 추적")
+![두 브라우저에서 문서 편집 내용이 함께 반영되는 시연](https://github.com/Lumisia/FileinNOut/raw/main/images/editor.gif)
 
-- 문서 전체를 하나의 JSON 문자열로 관리하지 않고, 각 EditorJS 블록을 id, type, data를 가진 독립적인 Y.Map으로 변환했습니다. 각 블록이 별도의 CRDT 객체가 되므로 서로 다른 블록에서 발생한 동시 변경을 독립적으로 병합할 수 있습니다.
-하지만 블럭이 교체되는 상황, 즉 내용이 변경되는 점은 어떻게 판단하는가가 문제였습니다.
+<details>
+<summary>실제 자동 테스트의 확인 코드</summary>
 
-```javascript
-function blockChanged(oldBlock, newBlock) {
-  return (
-    oldBlock.type !== newBlock.type ||
-    JSON.stringify(oldBlock.data) !== JSON.stringify(newBlock.data)
-  )
-}
+기존 통합 테스트에서 서로 다른 블록을 수정한 후 두 문서의 변경 내용과 최종 일치를 검사하는 부분입니다.
 
-export function diffBlocks(oldList, newList) {
-  const ops = []
+~~~js
+edA._arr[0].data = { text: 'A1' }
+await bindA.pushLocal()
+edB._arr[1].data = { text: 'X1' }
+await bindB.pushLocal()
 
-  const oldById = new Map(
-    oldList.map((block) => [block.id, block])
-  )
+exchange(docA, docB)
+await tick()
+await tick()
 
-  const newById = new Map(
-    newList.map((block) => [block.id, block])
-  )
+assert.equal(texts(edA._arr).a, 'A1', 'A 편집 보존')
+assert.equal(texts(edA._arr).x, 'X1', 'B 편집 반영(무손실)')
+assert.equal(texts(edB._arr).a, 'A1', 'A 편집 반영')
+assert.equal(texts(edB._arr).x, 'X1', 'B 편집 보존')
+assert.deepEqual(edA._arr, edB._arr, '수렴')
+~~~
 
-  // 이전 목록에만 존재하면 삭제
-  for (const oldBlock of oldList) {
-    if (!newById.has(oldBlock.id)) {
-      ops.push({
-        type: 'remove',
-        id: oldBlock.id,
-      })
-    }
-  }
-
-  // 양쪽에 존재하지만 내용이 바뀌었으면 수정
-  for (const newBlock of newList) {
-    const oldBlock = oldById.get(newBlock.id)
-
-    if (oldBlock && blockChanged(oldBlock, newBlock)) {
-      ops.push({
-        type: 'update',
-        id: newBlock.id,
-        block: newBlock,
-      })
-    }
-  }
-
-  return ops
-}
-```
-
-![Editor.js 블록의 id, type, data 구조](images/projects/fileinnout/editorjs-block-structure.png "Editor.js 블록 구조")
-
-- EditorJS의 이전 블록 목록과 현재 블록 목록을 id 기준 Map으로 변환했습니다. 이전 목록에만 존재하면 remove, 양쪽에 존재하지만 type이나 data가 달라졌으면 update 연산을 생성합니다. 이를 통해 문서 전체가 아닌 실제로 변경된 블록만 찾을 수 있습니다.
-
-그 결과 마지막 저장자가 다른 사용자의 편집을 덮어쓰던 문제와 사용자별 화면 불일치가 모두 해소되었습니다.
-"""
-
-result = """
-![여러 사용자가 동시에 워크스페이스를 편집하는 테스트](images/projects/fileinnout/workspace-test.gif "워크스페이스 실시간 협업 테스트")
-
-- 서로 다른 블록을 동시에 수정해도 두 변경사항 모두 보존
-- 동시 블록 추가도 유실 없이 병합
-- 클라이언트별 변경 수신 순서가 달라도 최종 상태 수렴
-- 전송 전 로컬 편집이 원격 변경으로 덮이는 문제 방지
-- 전체 문서 재렌더링 대신 변경된 블록만 반영
-- Redis를 통해 다중 WebSocket 서버에서도 동일한 문서 상태 공유
-"""
+</details>
+'''
 
 [[troubleshooting]]
-title = "2. 워크스페이스 조회 개선 — 30초 폴링에서 SSE 기반 갱신으로"
-problem = """
-워크스페이스 리스트는 초대·생성·삭제·제목 변경이 즉시 반영되어야 하는 화면입니다. 기존 구조는 **30초 주기 폴링**으로 서버에 반복 요청해 데이터를 다시 가져왔습니다.
+title = "2. 워크스페이스 목록에서 불필요한 반복 조회와 변경 반영 지연이 발생했습니다."
+architecture_image = "images/projects/fileinnout/workspace-list-architecture.svg"
+architecture_alt = "워크스페이스 목록에서 불필요한 반복 조회와 변경 반영 지연이 발생했습니다. 기능 전체 흐름"
+cause = '''
+1. 처음에는 워크스페이스 목록을 30초마다 다시 조회했는데, 목록에 변경이 없는 사용자도 같은 요청을 반복한다는 문제를 확인했습니다.
+2. 사용자 수에 따라 불필요한 조회가 늘어나는 한편, 실제 변경 사항은 다음 폴링까지 기다려야 화면에 반영됐습니다.
+3. 변경 내용을 관련 사용자에게 바로 전달하고 목록 API의 조회 비용도 줄여, 갱신 지연과 반복 조회 부담을 함께 해결해야 했습니다.
+'''
+solution = '''
+- 문서 제목이 변경되면 해당 문서와 연결된 사용자에게 SSE 이벤트를 보내 목록의 제목을 갱신했습니다.
+- 갱신 알림에는 서버에서 브라우저로 보내는 단방향 통신이면 충분해 WebSocket 대신 SSE를 선택했습니다.
+- 목록 API는 엔티티 전체를 조회한 뒤 DTO로 변환하던 방식에서 필요한 컬럼만 가져오는 Projection 쿼리로 변경했습니다.
+- `Pageable`을 적용해 기본 50건, 최대 100건으로 조회 범위를 제한했습니다.
 
-![30초 폴링과 전체 엔티티 조회를 사용하던 개선 전 nGrinder 결과](images/projects/fileinnout/workspace-list-before.png "워크스페이스 리스트 조회 개선 전")
+**목록 화면에 필요한 컬럼만 조회하는 실제 쿼리**
 
-이 방식은 변경이 없어도 계속 요청이 발생했고, 변경이 생겨도 다음 폴링 시점까지 최대 30초 지연될 수 있었습니다. 또한 워크스페이스 목록을 가져올 때 필요하지 않은 데이터까지 함께 조회해 리스트 응답 비용이 커졌습니다.
+엔티티 전체를 DTO로 변환하던 처리를 아래 Projection 조회로 바꾸고 `Pageable`로 반환 범위를 제한했습니다.
 
-```js
-// 개선 전: 일정 주기마다 리스트 재조회
-setInterval(() => {
-  fetchWorkspaceList()
-}, 30000)
-```
-
-```java
-public List<PostDto.ResList> list(Long userIdx) {
-    List<UserPost> userPosts = upr.findByUserIdx(userIdx);
-
-    return userPosts.stream()
-            .map(userPost -> PostDto.ResList.builder()
-                    .postIdx(userPost.getWorkspace().getIdx())
-                    .title(userPost.getWorkspace().getTitle())
-                    .updatedAt(userPost.getWorkspace().getUpdatedAt())
-                    .level(userPost.getLevel())
-                    .build())
-            .toList();
-}
-```
-"""
-cause = """
-핵심 원인은 갱신 책임과 조회 비용이 모두 클라이언트 폴링에 묶여 있었던 점입니다.
-
-- 폴링은 서버 변경 여부와 관계없이 요청을 발생시켜 대부분의 요청이 낭비됩니다.
-- 변경이 생겨도 클라이언트의 다음 30초 주기까지 화면 반영이 늦어집니다.
-- 기존 리스트 조회는 사용자 워크스페이스 엔티티를 먼저 가져온 뒤 DTO로 변환해, 목록 화면에 필요 없는 필드까지 로딩할 수 있습니다.
-- 목록 크기가 커질수록 매 폴링의 DB 조회·직렬화·렌더링 비용이 같이 커집니다.
-
-| 항목 | 개선 전 | 개선 후 | 변화 |
-|---|---:|---:|---:|
-| Total Users | 100 | 100 | 동일 조건 |
-| TPS | 32.7 | 192.4 | 약 5.88배 증가 |
-| Peak TPS | 40.5 | 283.0 | 약 6.99배 증가 |
-| Mean Test Time | 1,506.77ms | 162.04ms | 약 89.2% 감소 |
-| Executed Tests | 3,530 | 20,410 | 약 5.78배 증가 |
-| Errors | 0 | 0 | 오류 없음 |
-"""
-solution = """
-갱신 방식은 **SSE(Server-Sent Events)** 로 바꾸고, 실제 목록 조회 API는 **Projection + 페이지네이션** 기반으로 줄였습니다. 서버가 변경 이벤트를 사용자에게 푸시하고, 클라이언트는 이벤트를 받았을 때만 필요한 화면을 갱신합니다.
-
-![SSE와 Projection 기반 페이지 조회를 적용한 개선 후 nGrinder 결과](images/projects/fileinnout/workspace-list-after.png "워크스페이스 리스트 조회 개선 후")
-
-```java
-@GetMapping(value = "/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-public SseEmitter connect(@AuthenticationPrincipal AuthUserDetails user) {
-    SseEmitter emitter = new SseEmitter(60 * 1000L * 60);
-    emitterStore.put(user.getUserIdx(), UUID.randomUUID().toString(), emitter);
-    return emitter;
-}
-```
-
-```js
-eventSource.addEventListener('title-updated', (event) => {
-  window.dispatchEvent(new CustomEvent('sse-title-updated', {
-    detail: JSON.parse(event.data)
-  }))
-})
-```
-
-```java
-@GetMapping("/workspace/list")
-public ResponseEntity<List<PostDto.ResList>> list(
-        @CurrentUser User user,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "50") int size
-) {
-    return ResponseEntity.ok(postService.list(user.getIdx(), page, size));
-}
-```
-
-```java
-@Query(\"\"\"
+~~~java
+@Query("""
     SELECT w.idx as postIdx, w.title as title, w.updatedAt as updatedAt,
            w.status as status, w.UUID as uuid, up.Level as level
     FROM UserPost up
     JOIN up.workspace w
     WHERE up.user.idx = :userIdx
     ORDER BY w.updatedAt DESC, w.createdAt DESC
-\"\"\")
+    """)
 List<WorkspaceListProjection> findWorkspaceListByUserIdx(
-        @Param("userIdx") Long userIdx,
-        Pageable pageable
-);
-```
-"""
-result = """
-100명의 가상 사용자를 기준으로 nGrinder 부하 테스트를 진행했습니다. 평균 응답시간은 **1,506.77ms에서 162.04ms로 약 89.2% 감소**했고, TPS는 **32.7에서 192.4로 약 5.88배 증가**했습니다. 두 테스트 모두 오류는 0건이었습니다.
+        @Param("userIdx") Long userIdx, Pageable pageable);
+~~~
+'''
+result = '''
+제목 변경 시 다음 30초 폴링을 기다리던 문제를 해결하고, 관련 사용자에게 이벤트가 도착하면 해당 항목을 갱신하도록 했습니다. Projection과 페이지 처리를 적용한 개인 운영 당시 목록 API 측정에서는 TPS가 32.7에서 192.4로 증가했고, 평균 테스트 시간은 1,506.77ms에서 162.04ms로 약 89.2% 감소했습니다.
 
-즉, 워크스페이스 리스트는 변경 감지를 SSE로 실시간화하고, 조회 API는 Projection과 페이지네이션으로 가볍게 만들어 안정적으로 확장될 수 있도록 개선했습니다.
-"""
+테스트 조건: 가상 사용자 100명, 실행 시간 각 2분, 워크스페이스 약 1,000건, 동일 계정으로 목록 API 반복 호출.
+
+| 항목 | 개선 전 | 개선 후 |
+|---|---:|---:|
+| TPS | 32.7 | 192.4 |
+| 평균 테스트 시간 | 1,506.77ms | 162.04ms |
+| 오류 | 0 | 0 |
+
+**개인 운영 측정 전**
+
+![개인 운영 당시 목록 조회 개선 전](images/projects/fileinnout/workspace-list-before.png)
+
+**개인 운영 측정 후**
+
+![개인 운영 당시 목록 조회 개선 후](images/projects/fileinnout/workspace-list-after.png)
+'''
 
 [[troubleshooting]]
-title = "3. SSE 운영 안정화 — 재연결 폭주와 다중 인스턴스 알림 누락"
-problem = """
-프록시를 경유하는 실운영 HTTPS 환경으로 이전해 배포하자, 로그인 직후 `/api/sse/connect`가 200 응답 직후 `ERR_HTTP2_PROTOCOL_ERROR`로 끊기고 곧바로 재연결을 반복하는 문제가 새로 드러났습니다. QUIC을 비활성화해도 동일해 전송 프로토콜 문제가 아니었습니다.
+title = "3. 화면 진입 시 SSE 연결이 중복되어 끊김과 재연결이 반복됐습니다."
+architecture_image = "images/projects/fileinnout/sse-architecture.svg"
+architecture_alt = "화면 진입 시 SSE 연결이 중복되어 끊김과 재연결이 반복됐습니다. 기능 전체 흐름"
+cause = '''
+1. 화면에 들어갈 때 알림과 워크스페이스에서 SSE 연결을 각각 열어, 연결이 끊겼다가 다시 연결되는 동작이 반복되는 것을 확인했습니다.
+2. 사용자 ID 하나로 emitter를 저장해 두 연결이 서로 덮어쓰였고, 사용자 단위 삭제와 라이브러리 및 화면의 중복 재연결이 정상 연결에도 영향을 주었습니다.
+3. 화면 진입이나 연결 하나의 종료가 다른 알림 연결을 끊지 않도록 생성, 재연결, 정리의 책임을 모아야 했습니다.
+'''
+solution = '''
+- 프론트의 SSE 생성, 재사용, 종료를 공통 연결 관리로 모아 불필요한 중복 연결을 제거했습니다.
+- 라이브러리가 재연결 중일 때 수동 재연결을 추가하지 않고, 연결이 완전히 종료된 경우에만 한 번 예약하도록 했습니다.
+- 서버는 사용자 ID와 연결 ID로 emitter를 구분해 종료된 연결만 삭제하도록 변경했습니다.
+- 15초 heartbeat를 추가하고 기존 SSE 자동 테스트를 실행해 재연결 중복 방지와 명시적 종료 후 재연결 차단을 확인했습니다.
 
-동시에 블루/그린 배포와 스케일아웃으로 백엔드 인스턴스가 여러 개가 되자, 한 인스턴스에서 발생한 이벤트가 **다른 인스턴스에 연결된 사용자에게는 전달되지 않는** 문제도 드러났습니다.
-"""
-cause = """
-- 유저당 SSE 연결이 **2개**였습니다 — 알림 화면과 워크스페이스 화면이 각자 연결을 열었습니다.
-- 서버 저장소가 `Map<userId, emitter>` **단일 키**라 두 연결이 서로 emitter를 덮어썼고, 한쪽 `onError`의 `remove(userId)`가 **다른 연결의 emitter까지 제거**해 연쇄 재연결을 만들었습니다.
-- 알림 화면이 폴리필의 `onerror`를 덮어쓰고 자체 5초 타이머로도 재연결해, 폴리필 자체 재연결과 겹치며 연결이 증식했습니다.
-- SSE는 이벤트가 없으면 바이트가 흐르지 않아, 중간 프록시가 연결을 idle로 판정해 끊기 쉬웠습니다 (heartbeat 부재).
-- `SseEmitter`는 프로세스 로컬 객체라 인스턴스 사이에서 공유되지 않습니다.
-"""
-solution = """
-**1. 단일 연결 통합** — 앱 전체에서 SSE 연결을 하나만 열고 인증 스토어가 소유합니다. 서버 이벤트는 `window` CustomEvent로 재방출해 각 화면이 구독합니다. 연결·재연결 로직은 브라우저 의존성을 주입받는 순수 모듈로 분리해 `node:test`로 검증할 수 있게 했습니다.
+**자동 재연결과 수동 재연결을 구분하는 실제 코드**
 
-**2. 저장소를 (userId, connectionId) 2단계 맵으로 재설계** — 탭·화면이 여러 개여도 자신의 연결만 정확히 추가·제거합니다.
-
-```java
-// 한 사용자가 여러 연결(탭/기기)을 열 수 있으므로 userId -> (connectionId -> emitter)
-private final ConcurrentMap<Long, ConcurrentMap<String, SseEmitter>> emitters
-        = new ConcurrentHashMap<>();
-
-public void put(Long userId, String connectionId, SseEmitter emitter) {
-    emitters.computeIfAbsent(userId, key -> new ConcurrentHashMap<>())
-            .put(connectionId, emitter);
+~~~javascript
+export const shouldScheduleReconnect = ({ manuallyClosed, readyState, closedState }) => {
+  if (manuallyClosed) return false
+  return readyState === closedState
 }
-```
+~~~
 
-**3. 15초 heartbeat** — 주기적으로 SSE comment(`:ping`)를 보내 프록시의 idle 판정을 막습니다. comment 라인은 EventSource 클라이언트가 무시하므로 애플리케이션 이벤트에 영향이 없습니다.
+서버도 사용자 전체를 삭제하는 대신 연결 ID로 대상 emitter를 찾습니다. 아래는 연결 정리의 핵심 부분입니다.
 
-```java
-@Scheduled(fixedRate = HEARTBEAT_INTERVAL_MS) // 15초
-public void sendHeartbeat() {
-    emitterStore.forEachEmitter((userId, connectionId, emitter) -> {
-        try {
-            emitter.send(SseEmitter.event().comment("ping"));
-        } catch (IOException | IllegalStateException e) {
-            emitterStore.remove(userId, connectionId); // 끊긴 연결만 정리
-            emitter.completeWithError(e);
-        }
-    });
-}
-```
-
-**4. Redis Pub/Sub 인스턴스 중계** — 각 인스턴스가 이벤트를 Redis 채널에 발행하고, 모든 인스턴스가 같은 채널을 구독해 자신에게 연결된 사용자에게만 최종 전달합니다.
-
-![SSE 단일 연결·heartbeat·Redis 중계 적용 전후 구조](images/projects/fileinnout/sse-stabilization.svg "SSE 운영 안정화 적용 전후")
-"""
-result = """
-- 유저당 연결 1개가 유지되고, 200 직후 끊김·재연결 반복이 사라졌습니다.
-- 이벤트가 없는 구간에도 15초 heartbeat로 프록시 절단 없이 연결이 유지됩니다.
-- 블루/그린·스케일아웃 환경에서 어느 인스턴스에 연결돼도 동일하게 알림을 받습니다.
-- 동작은 `SseHeartbeatTest`, `SseEmitterStoreTest` 회귀 테스트로 고정했습니다.
-"""
+~~~java
+ConcurrentMap<String, SseEmitter> userEmitters = emitters.get(userId);
+if (userEmitters == null) return;
+userEmitters.remove(connectionId);
+~~~
+'''
+result = '''
+같은 브라우저 실행 환경에서 화면마다 SSE를 만들던 중복 연결을 제거하고, 라이브러리 재연결에 수동 재연결이 겹치던 문제를 해결했습니다. 로그아웃 등으로 명시적으로 종료한 연결은 재연결하지 않으며, 서버는 종료된 연결 ID를 기준으로 정리하도록 변경했습니다. 기존 SSE 자동 테스트에서 재연결 예약의 중복 방지와 명시적 종료 후 재연결 차단을 확인했습니다.
+'''
 +++
 
 <section class="proj-tech-section">

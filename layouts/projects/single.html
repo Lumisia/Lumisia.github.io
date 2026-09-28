@@ -64,6 +64,9 @@
       {{- with .Params.monitoring_links }}
       {{- $rows := where . "reason" "!=" nil }}
       {{- if $rows }}
+      <details class="project-disclosure project-disclosure--monitoring">
+        <summary><h2>관측 도구 설명</h2></summary>
+        <div class="project-disclosure-body project-disclosure-body--table">
       <table class="monitoring-table">
         <thead>
           <tr><th>관측 도구</th><th>보여주는 것 · 공개한 이유</th></tr>
@@ -77,6 +80,8 @@
           {{- end }}
         </tbody>
       </table>
+        </div>
+      </details>
       {{- end }}
       {{- end }}
       {{- end }}
@@ -129,9 +134,12 @@
       </section>
       {{- end }}
 
+      {{- if or .Params.features .Params.implementation_methods }}
+      <details class="project-disclosure project-disclosure--features">
+        <summary><h2>담당 영역</h2></summary>
+        <div class="project-disclosure-body">
       {{- with .Params.features }}
-      <section class="proj-detail-section proj-feature-section">
-        <h2 class="proj-sec-h">담당 영역</h2>
+      <section class="proj-feature-section">
         {{- with $.Params.features_intro }}
         <div class="feature-intro">{{ . | markdownify }}</div>
         {{- end }}
@@ -164,7 +172,7 @@
       {{/*
         Project detail front matter:
         [[implementation_methods]] title, description, items = []
-        [[troubleshooting]] title, problem, cause, solution, result
+        [[troubleshooting]] title, architecture_image, architecture_alt, cause, solution, result
       */}}
       {{- with .Params.implementation_methods }}
       <section class="proj-detail-section proj-implementation-section">
@@ -187,29 +195,38 @@
       </section>
       {{- end }}
 
+        </div>
+      </details>
+      {{- end }}
+
       {{- with .Params.troubleshooting }}
-      <section class="proj-detail-section proj-troubleshooting-section">
+      <section id="troubleshooting" class="proj-detail-section proj-troubleshooting-section">
         <h2 class="proj-sec-h">트러블 슈팅</h2>
         <div class="troubleshooting-list">
           {{- range . }}
           <article class="troubleshooting-card">
             {{- with .title }}<h3 class="proj-detail-title">{{ . }}</h3>{{- end }}
             <div class="troubleshooting-flow">
-              {{- with .problem }}
-              <section class="troubleshooting-step">
-                <h4>문제 상황</h4>
-                <div>{{ $.RenderString . }}</div>
+              {{- $architectureAlt := .architecture_alt | default "기능 전체 아키텍처" }}
+              {{- with .architecture_image }}
+              {{- with resources.Get . }}
+              <section class="troubleshooting-step troubleshooting-step--architecture">
+                <h4>전체 아키텍처</h4>
+                <a href="{{ .RelPermalink }}" target="_blank" rel="noopener" aria-label="{{ $architectureAlt }} 크게 보기">
+                  <img src="{{ .RelPermalink }}" alt="{{ $architectureAlt }}" loading="lazy">
+                </a>
               </section>
+              {{- end }}
               {{- end }}
               {{- with .cause }}
               <section class="troubleshooting-step">
-                <h4>원인 분석</h4>
+                <h4>문제 원인</h4>
                 <div>{{ $.RenderString . }}</div>
               </section>
               {{- end }}
               {{- with .solution }}
               <section class="troubleshooting-step troubleshooting-step--solution">
-                <h4>해결 방안</h4>
+                <h4>해결 과정</h4>
                 <div>{{ $.RenderString . }}</div>
               </section>
               {{- end }}

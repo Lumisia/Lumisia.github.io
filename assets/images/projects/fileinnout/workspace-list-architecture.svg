@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 640" role="img" aria-labelledby="title desc">
+<title id="title">워크스페이스 목록과 변경 알림</title><desc id="desc">최초 목록은 API로 조회하고, 제목 변경은 관련 사용자에게 전달</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#6b8199"/></marker></defs>
+<rect width="980" height="640" rx="18" fill="#f5f8fc"/>
+<g font-family="Pretendard, Malgun Gothic, sans-serif">
+<text x="40" y="45" font-size="24" font-weight="700" fill="#203b56">워크스페이스 목록과 변경 알림</text>
+<text x="40" y="75" font-size="16" fill="#546a80">최초 목록은 API로 조회하고, 제목 변경은 관련 사용자에게 전달</text>
+<path d="M300 155 L360 155" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M620 155 L680 155" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<path d="M300 345 L360 345" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M490 300 L490 250 L810 250 L810 200" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<rect x="600.0" y="224" width="100" height="23" rx="4" fill="#f5f8fc"/><text x="650" y="240" text-anchor="middle" font-size="15" fill="#52677d">저장 / 조회</text>
+<path d="M620 345 L680 345" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M810 390 L810 490" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="756.5" y="431" width="107" height="23" rx="4" fill="#f5f8fc"/><text x="810" y="447" text-anchor="middle" font-size="15" fill="#52677d">서버 간 발행</text>
+<path d="M680 535 L620 535" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M680 365 L650 365 L650 450 L490 450 L490 490" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="487.0" y="423" width="122" height="23" rx="4" fill="#f5f8fc"/><text x="548" y="439" text-anchor="middle" font-size="15" fill="#52677d">현재 서버 전달</text>
+<path d="M360 535 L300 535" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="40" y="110" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="170" y="144" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">목록 화면</text>
+<text x="170" y="169" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">최초 조회 / 페이지 요청</text>
+<rect x="360" y="110" width="260" height="90" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="490" y="144" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">목록 API</text>
+<text x="490" y="169" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">Projection + Pageable</text>
+<rect x="680" y="110" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="810" y="144" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">MariaDB</text>
+<text x="810" y="169" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">문서와 사용자 관계</text>
+<rect x="40" y="300" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="170" y="334" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">문서 편집 화면</text>
+<text x="170" y="359" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">제목 변경 요청</text>
+<rect x="360" y="300" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="490" y="334" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">PostService</text>
+<text x="490" y="359" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">저장 / 관련 사용자 조회</text>
+<rect x="680" y="300" width="260" height="90" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="810" y="334" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">SseService</text>
+<text x="810" y="359" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">관련 사용자에게 이벤트</text>
+<rect x="40" y="490" width="260" height="90" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="170" y="524" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">관련 사용자의 목록</text>
+<text x="170" y="549" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">해당 문서 제목 반영</text>
+<rect x="360" y="490" width="260" height="90" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="490" y="524" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">사용자별 SSE 연결</text>
+<text x="490" y="549" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">title-updated 전달</text>
+<rect x="680" y="490" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="810" y="524" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">Redis Pub/Sub</text>
+<text x="810" y="549" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">다른 서버로 이벤트 중계</text>
+</g></svg>

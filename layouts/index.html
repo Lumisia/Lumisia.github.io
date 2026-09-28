@@ -25,39 +25,21 @@
         <div class="hero-right">
           <h2 class="hero-name">{{ site.Params.label.text }}</h2>
           <p class="hero-role-main">Backend Developer</p>
-          <p class="hero-stack">Spring Boot · Kubernetes · Redis/Valkey · nGrinder</p>
-
-          {{- $metrics := slice
-            (dict "cap" "대시보드 평균 응답" "from" "11초"  "to" "0.8초" "note" "100 VU · nGrinder")
-            (dict "cap" "처리량 TPS"         "from" "7"     "to" "117"   "note" "Redis → Valkey 재측정")
-            (dict "cap" "요청 에러"          "from" "44건"  "to" "0건"   "note" "동일 시나리오")
-          -}}
-          <dl class="metric-strip">
-            {{- range $i, $m := $metrics }}
-            <div class="metric" style="--i:{{ $i }}">
-              <dt class="metric-cap">{{ $m.cap }}</dt>
-              <dd class="metric-val">
-                <span class="metric-from">{{ $m.from }}</span>
-                <span class="metric-track" aria-hidden="true"></span>
-                <span class="metric-to">{{ $m.to }}</span>
-              </dd>
-              <p class="metric-note">{{ $m.note }}</p>
-            </div>
-            {{- end }}
-          </dl>
-
-          <p class="hero-pitch">개선 전·후, 그리고 <b>대안까지</b> 측정해서 검증합니다. 같은 코드로 Redis와 Valkey를 비교 측정했고, 모든 성능 주장 뒤에는 nGrinder 리포트가 있습니다.</p>
+          <div class="hero-competencies" aria-labelledby="competencies-title">
+            <h3 id="competencies-title">핵심 역량</h3>
+            <ul>
+              <li><strong>Jenkins, k8s</strong>를 이용한 배포 파이프라인 설계 및 무중단 운영 경험 보유</li>
+              <li><strong>Spring Boot 기반 Restful API</strong> 개발 및 개선 경험</li>
+              <li><strong>JPA 반복 쿼리 개선 및 Redis 캐시 적용</strong>을 통한 성능 최적화</li>
+              <li>팀 프로젝트 3회 및 <strong>모놀리스 아키텍처를 모듈러 아키텍처로 개선</strong>한 경험</li>
+            </ul>
+          </div>
 
           <div class="hero-cta">
-            <a class="hero-cta-btn hero-cta-btn--primary" href="{{ (site.GetPage "/projects/callog").RelPermalink }}#troubleshooting">측정 리포트 보기</a>
+            <a class="hero-cta-btn hero-cta-btn--primary" href="#projects">프로젝트 보기</a>
             <a class="hero-cta-btn" href="{{ site.Params.githubURL }}" target="_blank" rel="noopener">GitHub</a>
           </div>
 
-          <div class="hero-tags">
-            <span class="hero-tag">성능을 고려하는 개발자</span>
-            <span class="hero-tag">이벤트 기반 아키텍처 설계</span>
-            <span class="hero-tag">기록하고 공유하는 개발자</span>
-          </div>
           <p class="hero-bio">새로운 기술들을 직접 부딪히며 빠르게 익히고, 블로그를 통해 깊이를 더합니다. 계층과 서비스 구조를 항상 생각하며 코드를 작성하고, <b>"이 구조와 코드가 정말 최선인가"</b>를 끊임없이 고민하는 개발자 입니다.</p>
         </div>
       </div>

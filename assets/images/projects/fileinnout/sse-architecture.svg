@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 640" role="img" aria-labelledby="title desc">
+<title id="title">SSE 연결의 생성과 유지</title><desc id="desc">프론트는 연결을 재사용하고, 서버는 연결 ID로 각각 관리</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#6b8199"/></marker></defs>
+<rect width="980" height="640" rx="18" fill="#f5f8fc"/>
+<g font-family="Pretendard, Malgun Gothic, sans-serif">
+<text x="40" y="45" font-size="24" font-weight="700" fill="#203b56">SSE 연결의 생성과 유지</text>
+<text x="40" y="75" font-size="16" fill="#546a80">프론트는 연결을 재사용하고, 서버는 연결 ID로 각각 관리</text>
+<path d="M300 155 L360 155" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M620 155 L680 155" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M810 200 L810 250 L490 250 L490 300" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="593.0" y="224" width="84" height="23" rx="4" fill="#f5f8fc"/><text x="635" y="240" text-anchor="middle" font-size="15" fill="#52677d">연결 등록</text>
+<path d="M490 300 L490 200" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="451.0" y="266" width="78" height="23" rx="4" fill="#f5f8fc"/><text x="490" y="282" text-anchor="middle" font-size="15" fill="#52677d">SSE 수신</text>
+<path d="M360 175 L325 175 L325 345 L300 345" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M680 345 L620 345" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M170 490 L170 435 L490 435 L490 390" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="222.5" y="409" width="221" height="23" rx="4" fill="#f5f8fc"/><text x="333" y="425" text-anchor="middle" font-size="15" fill="#52677d">전송 실패 시 해당 연결 정리</text>
+<path d="M810 490 L810 390" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="40" y="110" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="170" y="144" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">로그인 상태 / 화면</text>
+<text x="170" y="169" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">연결 시작과 명시적 종료</text>
+<rect x="360" y="110" width="260" height="90" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="490" y="144" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">공통 연결 관리자</text>
+<text x="490" y="169" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">재사용 / 재연결 예약</text>
+<rect x="680" y="110" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="810" y="144" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">SSE Controller</text>
+<text x="810" y="169" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">인증된 연결 요청</text>
+<rect x="40" y="300" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="170" y="334" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">목록과 알림 화면</text>
+<text x="170" y="359" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">이벤트 구독과 화면 갱신</text>
+<rect x="360" y="300" width="260" height="90" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="490" y="325" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">SseEmitterStore</text>
+<text x="490" y="350" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">사용자 ID + 연결 ID</text>
+<text x="490" y="375" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">종료된 연결만 정리</text>
+<rect x="680" y="300" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="810" y="334" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">Redis Pub/Sub</text>
+<text x="810" y="359" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">다른 서버의 이벤트 수신</text>
+<rect x="40" y="490" width="260" height="90" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="170" y="524" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">15초 heartbeat</text>
+<text x="170" y="549" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">연결에 ping 전송</text>
+<rect x="680" y="490" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="810" y="524" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">제목 변경 / 알림 서비스</text>
+<text x="810" y="549" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">이벤트 발행</text>
+</g></svg>

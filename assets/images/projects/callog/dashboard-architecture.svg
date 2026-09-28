@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 640" role="img" aria-labelledby="title desc">
+<title id="title">대시보드 통합 조회와 캐시</title><desc id="desc">통합 메서드에서 캐시를 적용하고, 미적중일 때 조건 조회와 집계 수행</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#6b8199"/></marker></defs>
+<rect width="980" height="640" rx="18" fill="#f5f8fc"/>
+<g font-family="Pretendard, Malgun Gothic, sans-serif">
+<text x="40" y="45" font-size="24" font-weight="700" fill="#203b56">대시보드 통합 조회와 캐시</text>
+<text x="40" y="75" font-size="16" fill="#546a80">통합 메서드에서 캐시를 적용하고, 미적중일 때 조건 조회와 집계 수행</text>
+<path d="M300 155 L360 155" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M620 155 L680 155" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M810 200 L810 245 L490 245 L490 300" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="608.0" y="219" width="84" height="23" rx="4" fill="#f5f8fc"/><text x="650" y="235" text-anchor="middle" font-size="15" fill="#52677d">캐시 조회</text>
+<path d="M620 345 L680 345" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="619.5" y="316" width="61" height="23" rx="4" fill="#f5f8fc"/><text x="650" y="332" text-anchor="middle" font-size="15" fill="#52677d">미적중</text>
+<path d="M680 375 L620 375" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="608.0" y="387" width="84" height="23" rx="4" fill="#f5f8fc"/><text x="650" y="403" text-anchor="middle" font-size="15" fill="#52677d">결과 저장</text>
+<path d="M360 345 L300 345" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="307.0" y="316" width="46" height="23" rx="4" fill="#f5f8fc"/><text x="330" y="332" text-anchor="middle" font-size="15" fill="#52677d">적중</text>
+<path d="M170 300 L170 200" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="147.0" y="239" width="46" height="23" rx="4" fill="#f5f8fc"/><text x="170" y="255" text-anchor="middle" font-size="15" fill="#52677d">응답</text>
+<path d="M810 390 L810 490" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<rect x="760.0" y="431" width="100" height="23" rx="4" fill="#f5f8fc"/><text x="810" y="447" text-anchor="middle" font-size="15" fill="#52677d">조회 / 집계</text>
+<path d="M170 490 L170 435 L490 435 L490 390" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="292.0" y="409" width="84" height="23" rx="4" fill="#f5f8fc"/><text x="334" y="425" text-anchor="middle" font-size="15" fill="#52677d">버전 증가</text>
+<rect x="40" y="110" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="170" y="144" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">Vue 대시보드</text>
+<text x="170" y="169" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">통합 데이터 요청</text>
+<rect x="360" y="110" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="490" y="144" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">Dashboard Controller</text>
+<text x="490" y="169" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">사용자와 조회 기간 전달</text>
+<rect x="680" y="110" width="260" height="90" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="810" y="144" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">loadAll() / @Cacheable</text>
+<text x="810" y="169" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">사용자 + 기간 + 버전 키</text>
+<rect x="40" y="300" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="170" y="334" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">대시보드 통합 응답</text>
+<text x="170" y="359" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">화면 데이터 한 번에 반환</text>
+<rect x="360" y="300" width="260" height="90" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="490" y="334" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">Redis / Valkey</text>
+<text x="490" y="359" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">통합 응답 캐시</text>
+<rect x="680" y="300" width="260" height="90" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="810" y="334" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">조건 조회와 집계</text>
+<text x="810" y="359" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">IN / COUNT / GROUP BY</text>
+<rect x="40" y="490" width="260" height="90" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="170" y="524" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">업무 데이터 변경</text>
+<text x="170" y="549" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">해당 사용자 캐시 버전 갱신</text>
+<rect x="680" y="490" width="260" height="90" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="810" y="524" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">MariaDB</text>
+<text x="810" y="549" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">캠페인 / KPI / 업무 데이터</text>
+</g></svg>

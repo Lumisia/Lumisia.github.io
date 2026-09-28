@@ -1,6 +1,10 @@
 {{- $destination := .Destination -}}
+{{- if or (hasPrefix $destination "https://") (hasPrefix $destination "http://") -}}
+<img src="{{ $destination | safeURL }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }} loading="lazy">
+{{- else -}}
 {{- with resources.Get $destination -}}
 <img src="{{ .RelPermalink }}" alt="{{ $.Text }}"{{ with $.Title }} title="{{ . }}"{{ end }} loading="lazy">
 {{- else -}}
 <img src="{{ $destination | safeURL }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }} loading="lazy">
+{{- end -}}
 {{- end -}}
