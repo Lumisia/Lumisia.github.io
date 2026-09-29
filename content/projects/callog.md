@@ -7,7 +7,7 @@ slug = "callog"
 category = "Campaign Management Platform"
 summary = "캠페인 기획부터 일정·KPI·광고 검수·파트너 협업까지 연결하는 통합 워크스페이스"
 description = "Callog는 캠페인 기획, 파트너 매칭, 일정과 업무, KPI, 광고 검수를 하나의 흐름으로 관리하는 캠페인 협업 플랫폼입니다. Vue 3와 Spring Boot 기반으로 구성했으며, 대시보드 집계 API와 JPA 쿼리를 최적화하고 Redis·Valkey 캐시를 적용해 조회 병목을 개선했습니다."
-cover = { image = "images/projects/callog/callog.png", fit = "contain" }
+cover = { image = "images/projects/callog/callog.png", fit = "cover", position = "right center" }
 live_demo = "https://www.magamcallog.kro.kr/"
 repository = "https://github.com/Lumisia/Callog"
 architecture_image = "images/projects/callog/callog-architecture.png"

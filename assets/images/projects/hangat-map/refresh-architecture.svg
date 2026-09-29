@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 680" role="img" aria-labelledby="title desc">
+<title id="title">Refresh Token 재발급과 수명 관리</title><desc id="desc">중복 요청을 줄이고 서버에서 잠금, 회전, 재사용과 만료를 함께 처리</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#6b8199"/></marker></defs>
+<rect width="980" height="680" rx="18" fill="#f5f8fc"/>
+<g font-family="Pretendard, Malgun Gothic, sans-serif">
+<text x="40" y="45" font-size="24" font-weight="700" fill="#203b56">Refresh Token 재발급과 수명 관리</text>
+<text x="40" y="75" font-size="16" fill="#546a80">중복 요청을 줄이고 서버에서 잠금, 회전, 재사용과 만료를 함께 처리</text>
+<path d="M300 160 L360 160" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M620 160 L680 160" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M810 210 L810 255 L490 255 L490 310" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="600.5" y="228" width="99" height="23" rx="4" fill="#f5f8fc"/><text x="650" y="244" text-anchor="middle" font-size="15" fill="#52677d">재발급 처리</text>
+<path d="M620 360 L680 360" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<path d="M435 410 L435 460 L170 460 L170 510" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="268.0" y="433" width="84" height="23" rx="4" fill="#f5f8fc"/><text x="310" y="449" text-anchor="middle" font-size="15" fill="#52677d">사용 가능</text>
+<path d="M545 410 L545 460 L810 460 L810 510" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="625.5" y="433" width="99" height="23" rx="4" fill="#f5f8fc"/><text x="675" y="449" text-anchor="middle" font-size="15" fill="#52677d">이미 폐기됨</text>
+<path d="M170 510 L170 295 L360 295 L360 185" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="157.5" y="265" width="107" height="23" rx="4" fill="#f5f8fc"/><text x="211" y="281" text-anchor="middle" font-size="15" fill="#52677d">새 토큰 응답</text>
+<rect x="40" y="110" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="170" y="148" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">브라우저의 여러 API</text>
+<text x="170" y="173" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">인증 토큰 재발급 요청</text>
+<rect x="360" y="110" width="260" height="100" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="490" y="148" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">공유 refreshPromise</text>
+<text x="490" y="173" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">같은 실행 환경의 요청 공유</text>
+<rect x="680" y="110" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="810" y="148" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">인증 API</text>
+<text x="810" y="173" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">Refresh 쿠키 전달</text>
+<rect x="360" y="310" width="260" height="100" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="490" y="338" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">AuthService</text>
+<text x="490" y="363" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">사용자와 토큰 순서로 잠금</text>
+<text x="490" y="388" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">최신 폐기 / 만료 상태 확인</text>
+<rect x="680" y="310" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="810" y="338" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">MariaDB</text>
+<text x="810" y="363" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">토큰 해시와 상태</text>
+<text x="810" y="388" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">절대 만료 시각</text>
+<rect x="40" y="510" width="260" height="100" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="170" y="538" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">유효한 토큰: 회전</text>
+<text x="170" y="563" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">기존 토큰 폐기와 새 발급</text>
+<text x="170" y="588" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">기존 expiresAt 유지</text>
+<rect x="680" y="510" width="260" height="100" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="810" y="538" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">폐기된 토큰: 재사용 감지</text>
+<text x="810" y="563" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">사용자 활성 토큰 폐기</text>
+<text x="810" y="588" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">오류 응답 후에도 폐기 유지</text>
+<text x="40" y="651" font-size="15" fill="#546a80">다른 탭의 요청까지 공유하지 않으며, 만료된 토큰은 재발급을 거절</text></g></svg>

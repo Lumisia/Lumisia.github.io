@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 680" role="img" aria-labelledby="title desc">
+<title id="title">비밀번호 재설정과 공통 코드 검증</title><desc id="desc">비밀번호 찾기와 마이페이지는 같은 API, 소셜 인증은 공통 컴포넌트 재사용</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#6b8199"/></marker></defs>
+<rect width="980" height="680" rx="18" fill="#f5f8fc"/>
+<g font-family="Pretendard, Malgun Gothic, sans-serif">
+<text x="40" y="45" font-size="24" font-weight="700" fill="#203b56">비밀번호 재설정과 공통 코드 검증</text>
+<text x="40" y="75" font-size="16" fill="#546a80">비밀번호 찾기와 마이페이지는 같은 API, 소셜 인증은 공통 컴포넌트 재사용</text>
+<path d="M300 160 L360 160" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M620 160 L680 160" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<path d="M300 360 L360 360" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M620 360 L680 360" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<path d="M580 210 L650 210 L650 470 L580 470 L580 510" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="658.0" y="430" width="84" height="23" rx="4" fill="#f5f8fc"/><text x="700" y="446" text-anchor="middle" font-size="15" fill="#52677d">공통 검증</text>
+<path d="M490 410 L490 510" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="448.0" y="446" width="84" height="23" rx="4" fill="#f5f8fc"/><text x="490" y="462" text-anchor="middle" font-size="15" fill="#52677d">공통 검증</text>
+<path d="M390 210 L320 210 L320 250 L20 250 L20 560 L40 560" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M390 410 L390 445 L170 445 L170 510" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="230.0" y="417" width="84" height="23" rx="4" fill="#f5f8fc"/><text x="272" y="433" text-anchor="middle" font-size="15" fill="#52677d">메일 발송</text>
+<rect x="40" y="110" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="170" y="148" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">비밀번호 찾기 / 마이페이지</text>
+<text x="170" y="173" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">동일한 재설정 API 사용</text>
+<rect x="360" y="110" width="260" height="100" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="490" y="138" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">재설정 API와 서비스</text>
+<text x="490" y="163" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">코드 확인 후 티켓 발급</text>
+<text x="490" y="188" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">유효한 티켓으로 변경</text>
+<rect x="680" y="110" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="810" y="138" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">회원과 인증 요청 DB</text>
+<text x="810" y="163" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">실패 횟수 / 티켓 상태</text>
+<text x="810" y="188" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">비밀번호 / Refresh Token</text>
+<rect x="40" y="310" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="170" y="348" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">소셜 가입 / 계정 연결</text>
+<text x="170" y="373" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">별도의 OAuth API 사용</text>
+<rect x="360" y="310" width="260" height="100" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="490" y="338" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">OAuth 가입과 연결 서비스</text>
+<text x="490" y="363" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">코드 확인 후 가입 / 연결</text>
+<text x="490" y="388" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">기능별 진행 상태 관리</text>
+<rect x="680" y="310" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="810" y="338" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">OAuth 인증 상태 DB</text>
+<text x="810" y="363" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">인증 목적 / 이메일 확인</text>
+<text x="810" y="388" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">가입과 연결 진행 상태</text>
+<rect x="40" y="510" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="170" y="548" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">공통 메일 발송기</text>
+<text x="170" y="573" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">사용자 이메일로 코드 전달</text>
+<rect x="360" y="510" width="260" height="100" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="490" y="538" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">공통 코드 생성과 검증</text>
+<text x="490" y="563" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">Generator / Hasher</text>
+<text x="490" y="588" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">목적 + 요청 식별자 + 코드</text>
+<text x="40" y="651" font-size="15" fill="#546a80">코드 10분 / 실패 최대 5회 / 재설정 티켓 5분 / 코드 발송 시 기존 비밀번호 유지</text></g></svg>

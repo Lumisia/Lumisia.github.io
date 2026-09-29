@@ -7,7 +7,7 @@ slug = "fileinnout"
 category = "Collaboration · 팀 프로젝트"
 summary = "팀 프로젝트를 위한 통합 협업 플랫폼"
 description = "팀 워크스페이스 관리, 실시간 협업 문서, 역할별 권한, 초대·알림, 실시간 사용자 제어를 제공하는 협업 플랫폼입니다. 파일들을 저장 및 공유할 수 있으며, 워크스페이스라는 문서 작업을 하며 Notion 스타일의 블럭 에디터를 사용합니다. Yjs Websocket + Editor.js를 사용했으며 백엔드는 Redis를 통해 배포할 때도 동시성 제어를 하게끔 했습니다."
-cover = { image = "images/projects/fileinnout/FileinNout.png" }
+cover = { image = "images/projects/fileinnout/FileinNout.png", fit = "cover" }
 live_demo = "https://lumisia.fileinnout.com/"
 repository = "https://github.com/Lumisia/FileinNOut"
 architecture_image = "images/projects/fileinnout/fileinnout.system_architecture.png"

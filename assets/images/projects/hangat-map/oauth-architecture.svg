@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 680" role="img" aria-labelledby="title desc">
+<title id="title">소셜 로그인과 기존 계정 연결</title><desc id="desc">제공자 인증은 서버에서 처리하고 이메일 확인 후 가입과 연결을 결정</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#6b8199"/></marker></defs>
+<rect width="980" height="680" rx="18" fill="#f5f8fc"/>
+<g font-family="Pretendard, Malgun Gothic, sans-serif">
+<text x="40" y="45" font-size="24" font-weight="700" fill="#203b56">소셜 로그인과 기존 계정 연결</text>
+<text x="40" y="75" font-size="16" fill="#546a80">제공자 인증은 서버에서 처리하고 이메일 확인 후 가입과 연결을 결정</text>
+<path d="M360 160 L330 160 L330 260 L170 260 L170 310" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="230.5" y="229" width="99" height="23" rx="4" fill="#f5f8fc"/><text x="280" y="245" text-anchor="middle" font-size="15" fill="#52677d">로그인 시작</text>
+<path d="M170 210 L170 310" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<path d="M300 360 L360 360" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M490 210 L490 310" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="440.0" y="248" width="100" height="23" rx="4" fill="#f5f8fc"/><text x="490" y="264" text-anchor="middle" font-size="15" fill="#52677d">입력 / 동의</text>
+<path d="M620 360 L680 360" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<path d="M620 335 L650 335 L650 185 L680 185" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="678.0" y="245" width="84" height="23" rx="4" fill="#f5f8fc"/><text x="720" y="261" text-anchor="middle" font-size="15" fill="#52677d">코드 발송</text>
+<path d="M680 155 L620 155" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M490 410 L490 465 L170 465 L170 510" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="261.0" y="438" width="138" height="23" rx="4" fill="#f5f8fc"/><text x="330" y="454" text-anchor="middle" font-size="15" fill="#52677d">가입 / 연결 완료</text>
+<path d="M300 560 L360 560" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M620 560 L680 560" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M580 510 L580 475 L810 475 L810 410" fill="none" stroke="#6b8199" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<rect x="725.0" y="447" width="84" height="23" rx="4" fill="#f5f8fc"/><text x="767" y="463" text-anchor="middle" font-size="15" fill="#52677d">토큰 조회</text>
+<rect x="40" y="110" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="170" y="148" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">Google / Kakao</text>
+<text x="170" y="173" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">제공자 인증</text>
+<rect x="360" y="110" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="490" y="148" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">브라우저</text>
+<text x="490" y="173" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">로그인 / 이메일 / 코드 입력</text>
+<rect x="680" y="110" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="810" y="148" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">메일 서버</text>
+<text x="810" y="173" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">이메일 인증 코드 발송</text>
+<rect x="40" y="310" width="260" height="100" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="170" y="338" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">Spring Security</text>
+<text x="170" y="363" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">인가 코드와 토큰 교환</text>
+<text x="170" y="388" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">OAuth 왕복에 임시 세션</text>
+<rect x="360" y="310" width="260" height="100" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="490" y="338" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">가입과 계정 연결 서비스</text>
+<text x="490" y="363" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">이메일 소유권 확인</text>
+<text x="490" y="388" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">가입 / 연결 동의 처리</text>
+<rect x="680" y="310" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="810" y="338" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">MariaDB</text>
+<text x="810" y="363" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">회원 / 소셜 계정</text>
+<text x="810" y="388" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">인증 진행 상태</text>
+<rect x="40" y="510" width="260" height="100" rx="12" fill="#e5effa" stroke="#6293c0" stroke-width="1.5"/>
+<text x="170" y="538" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">로그인 완료</text>
+<text x="170" y="563" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">HttpOnly Refresh 쿠키</text>
+<text x="170" y="588" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">완료 URL에는 화면 상태만</text>
+<rect x="360" y="510" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="490" y="548" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">토큰 재발급 API</text>
+<text x="490" y="573" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">Refresh 쿠키 확인</text>
+<rect x="680" y="510" width="260" height="100" rx="12" fill="#ffffff" stroke="#bacbdc" stroke-width="1.5"/>
+<text x="810" y="548" text-anchor="middle" font-size="18" font-weight="700" fill="#244867">프론트 메모리</text>
+<text x="810" y="573" text-anchor="middle" font-size="16" font-weight="400" fill="#52677d">Access Token으로 API 호출</text>
+<text x="40" y="651" font-size="15" fill="#546a80">카카오: 이메일 인증 후 기존 계정 조회와 연결 동의 / 이미 연결된 소셜 계정은 바로 로그인</text></g></svg>

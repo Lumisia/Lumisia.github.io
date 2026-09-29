@@ -90,7 +90,7 @@
         {{- $project := . }}
         <a class="proj-tile reveal" href="{{ .RelPermalink }}">
           {{- with resources.Get .Params.cover.image }}
-          <img class="tile-img{{ if eq $project.Params.cover.fit "contain" }} tile-img--contain{{ end }}" src="{{ .RelPermalink }}" alt="{{ $project.Title }} 대표 이미지">
+          <img class="tile-img{{ if eq $project.Params.cover.fit "contain" }} tile-img--contain{{ end }}" src="{{ .RelPermalink }}" alt="{{ $project.Title }} 대표 이미지"{{ with $project.Params.cover.position }} style="object-position: {{ . }}"{{ end }}>
           {{- end }}
           <div class="tile-overlay">
             <span class="tile-cat">{{ .Params.category }}</span>

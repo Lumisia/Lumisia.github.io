@@ -6,7 +6,7 @@
       <a class="project-back" href="{{ site.Home.RelPermalink }}#projects">← Projects</a>
 
       {{- with resources.Get .Params.cover.image }}
-      <img class="project-cover" src="{{ .RelPermalink }}" alt="{{ $.Title }} 대표 이미지">
+      <img class="project-cover{{ if eq $.Params.cover.fit "cover" }} project-cover--fill{{ end }}" src="{{ .RelPermalink }}" alt="{{ $.Title }} 대표 이미지"{{ with $.Params.cover.position }} style="object-position: {{ . }}"{{ end }}>
       {{- end }}
 
       <header class="project-header">
@@ -20,7 +20,7 @@
       {{- with .Params.period }}{{- $parts = $parts | append . }}{{- end }}
       {{- with .Params.team }}{{- $parts = $parts | append . }}{{- end }}
       {{- with .Params.responsibility }}{{- $parts = $parts | append . }}{{- end }}
-      <p class="proj-info-bar">{{ delimit $parts " · " }}</p>
+      <p class="proj-info-bar">{{ range $parts }}<span>{{ . }}</span>{{ end }}</p>
       {{- end }}
 
       {{- if or .Params.live_demo .Params.repository .Params.monitoring_links }}
@@ -145,7 +145,7 @@
         {{- end }}
         <div class="feature-list">
           {{- range . }}
-          <article class="feature-block">
+          <article class="feature-block{{ with .image_layout }} feature-block--{{ . }}{{ end }}">
             {{- with .heading }}<h3 class="proj-detail-title">{{ . }}</h3>{{- end }}
             {{- with .images }}
             <div class="feature-shot-grid">
