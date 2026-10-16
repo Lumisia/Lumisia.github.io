@@ -45,8 +45,8 @@ items = [
 
 [[monitoring_links]]
 label = "Jaeger"
-reason = "분산 트레이싱 — 요청이 게이트웨이·백엔드를 거치는 경로와 지연 구간을 실제 트래픽 기준으로 추적합니다. Istio 텔레메트리를 직접 연동했음을 보여줍니다."
-url   = "https://jaeger.fileinnout.com/search?end=1781757710987000&limit=20&lookback=1h&maxDuration&minDuration&service=jaeger-all-in-one&start=1781754110987000"
+reason = "백엔드 요청 추적 — Spring Boot가 Jaeger로 전송한 실제 요청의 처리 시간과 추적 기록을 확인할 수 있습니다. 최근 1시간의 backend_team 서비스를 조회합니다."
+url   = "https://jaeger.fileinnout.com/search?service=backend_team&lookback=1h&limit=20"
 icon  = "jaeger"
 
 [[monitoring_links]]
