@@ -1,0 +1,94 @@
+File in & Out workspace-list implementation excerpt
+Captured: 2026-10-18
+Source: uncommitted local working tree
+Public baseline: b2861b4182c251729297744eaf6a53d444afcb9f
+Scope: repository projection and service pagination changes only.
+The deployed revision used for the historical performance capture has not been matched to this working copy.
+
+diff --git a/backend/src/main/java/com/example/WaffleBear/workspace/repository/UserPostRepository.java b/backend/src/main/java/com/example/WaffleBear/workspace/repository/UserPostRepository.java
+index 2e9f1e3..98811fc 100644
+--- a/backend/src/main/java/com/example/WaffleBear/workspace/repository/UserPostRepository.java
++++ b/backend/src/main/java/com/example/WaffleBear/workspace/repository/UserPostRepository.java
+@@ -3,0 +4,2 @@ import com.example.WaffleBear.user.model.User;
++import com.example.WaffleBear.workspace.model.post.isShare;
++import com.example.WaffleBear.workspace.model.relation.AccessRole;
+@@ -4,0 +7 @@ import com.example.WaffleBear.workspace.model.relation.UserPost;
++import org.springframework.data.domain.Pageable;
+@@ -8,0 +12 @@ import org.springframework.data.repository.query.Param;
++import java.time.LocalDateTime;
+@@ -23,0 +28,15 @@ public interface UserPostRepository extends JpaRepository<UserPost, Long> {
++    @Query("""
++            SELECT
++                w.idx as postIdx,
++                w.title as title,
++                w.updatedAt as updatedAt,
++                w.status as status,
++                w.UUID as uuid,
++                up.Level as level
++            FROM UserPost up
++            JOIN up.workspace w
++            WHERE up.user.idx = :userIdx
++            ORDER BY w.updatedAt DESC, w.createdAt DESC
++            """)
++    List<WorkspaceListProjection> findWorkspaceListByUserIdx(@Param("userIdx") Long userIdx, Pageable pageable);
++
+@@ -46,0 +66,14 @@ public interface UserPostRepository extends JpaRepository<UserPost, Long> {
++
++    interface WorkspaceListProjection {
++        Long getPostIdx();
++
++        String getTitle();
++
++        LocalDateTime getUpdatedAt();
++
++        isShare getStatus();
++
++        String getUuid();
++
++        AccessRole getLevel();
++    }
+diff --git a/backend/src/main/java/com/example/WaffleBear/workspace/service/PostService.java b/backend/src/main/java/com/example/WaffleBear/workspace/service/PostService.java
+index 3518843..1a24b0e 100644
+--- a/backend/src/main/java/com/example/WaffleBear/workspace/service/PostService.java
++++ b/backend/src/main/java/com/example/WaffleBear/workspace/service/PostService.java
+@@ -25,0 +26,2 @@ import lombok.RequiredArgsConstructor;
++import org.springframework.data.domain.PageRequest;
++import org.springframework.data.domain.Pageable;
+@@ -42,0 +45,2 @@ public class PostService {
++    public static final int DEFAULT_WORKSPACE_LIST_SIZE = 50;
++    public static final int MAX_WORKSPACE_LIST_SIZE = 100;
+@@ -455,3 +459,31 @@ public class PostService {
+-        List<UserPost> relationList =
+-                upr.findAllByUser_IdxOrderByWorkspaceUpdatedAtDesc(userIdx);
+-        return relationList.stream().map(PostDto.ResList::from).toList();
++        return list(userIdx, 0, DEFAULT_WORKSPACE_LIST_SIZE);
++    }
++
++    @Transactional(readOnly = true)
++    public List<PostDto.ResList> list(Long userIdx, Integer page, Integer size) {
++        Pageable pageable = PageRequest.of(normalizePage(page), normalizeSize(size));
++        return upr.findWorkspaceListByUserIdx(userIdx, pageable)
++                .stream()
++                .map(row -> new PostDto.ResList(
++                        row.getPostIdx(),
++                        row.getTitle(),
++                        row.getUpdatedAt(),
++                        row.getStatus(),
++                        row.getUuid(),
++                        row.getLevel()
++                ))
++                .toList();
++    }
++
++    private int normalizePage(Integer page) {
++        if (page == null || page < 0) {
++            return 0;
++        }
++        return page;
++    }
++
++    private int normalizeSize(Integer size) {
++        if (size == null || size <= 0) {
++            return DEFAULT_WORKSPACE_LIST_SIZE;
++        }
++        return Math.min(size, MAX_WORKSPACE_LIST_SIZE);

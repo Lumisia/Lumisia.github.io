@@ -108,6 +108,15 @@ body = """
 
 [[troubleshooting]]
 title = "1. 대시보드에서 조회 지연으로 데이터가 표시되지 않거나 일부만 표시되는 문제가 있었습니다."
+kind = "문제 해결 · 초기 구현"
+evidence_note = "성능 기록은 동일 계정의 반복 조회 시나리오이며, 수동 확인 문서는 기능별 재현 절차입니다."
+evidence = [
+  { label = "통합 응답 캐시 적용 코드", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/backend/app/src/main/java/org/example/backend/dashboard/service/DashboardAggregateService.java#L103-L129" },
+  { label = "조건 조회·집계 호출 코드", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/backend/app/src/main/java/org/example/backend/dashboard/service/DashboardAggregateService.java#L134-L175" },
+  { label = "대시보드 수동 확인 절차", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/docs/callog-feature-test-guide.md#L45-L82" },
+  { label = "쿼리 개선 변경 이력", url = "https://github.com/Lumisia/Callog/commit/82c0529f9f73986a9db0bf859bdda2326da90dc3" },
+  { label = "측정 조건·Redis·Valkey 결과 기록 · 팀 위키", url = "https://github.com/beyond-sw-camp/be24-fin-magamFairy-callog/wiki/Redis-%ED%99%9C%EC%9A%A9-%EC%A0%84%EB%9E%B5" },
+]
 architecture_image = "images/projects/callog/dashboard-architecture.svg"
 architecture_alt = "대시보드에서 조회 지연으로 데이터가 표시되지 않거나 일부만 표시되는 문제가 있었습니다. 기능 전체 흐름"
 cause = '''
@@ -177,6 +186,12 @@ result = '''
 
 [[troubleshooting]]
 title = "2. 캘린더에서 기간 일정이 반복 표시되고 다른 일정을 가리는 문제가 있었습니다."
+kind = "문제 해결 · 더미 일정 테스트"
+evidence = [
+  { label = "주차별 구간·겹침·줄 배치 코드", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/frontend/src/components/overview/MainCalendar.vue#L246-L280" },
+  { label = "기간 일정 표시 개선 변경 이력", url = "https://github.com/Lumisia/Callog/commit/004ae2e69b037af6f00a7e1eac96879caeaf70f5" },
+  { label = "캘린더 수동 확인 절차", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/docs/callog-feature-test-guide.md#L264-L300" },
+]
 architecture_image = "images/projects/callog/calendar-architecture.svg"
 architecture_alt = "캘린더에서 기간 일정이 반복 표시되고 다른 일정을 가리는 문제가 있었습니다. 기능 전체 흐름"
 cause = '''
@@ -212,9 +227,19 @@ result = '''
 '''
 
 [[troubleshooting]]
-title = "3. 다중 Pod 환경에서 스케줄러가 같은 작업을 중복 실행할 수 있었습니다."
+title = "3. 이전 프로젝트 경험을 바탕으로 다중 Pod 스케줄러의 중복 실행을 예방했습니다."
+kind = "예방 설계 · 이전 프로젝트 경험 반영"
+cause_label = "설계 배경"
+solution_label = "설계·구현"
+result_label = "적용 범위"
+evidence = [
+  { label = "UUID 소유 토큰·TTL·Lua 해제 코드", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/backend/app/src/main/java/org/example/backend/common/redis/RedisLock.java" },
+  { label = "KPI 스냅샷 스케줄러의 락 적용", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/backend/app/src/main/java/org/example/backend/kpi/scheduler/SnapshotScheduler.java#L54-L87" },
+  { label = "Pod 간 SSE 이벤트 발행", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/backend/app/src/main/java/org/example/backend/notification/service/NotificationSseService.java#L107-L126" },
+  { label = "분산 락·알림 중계 도입 변경 이력", url = "https://github.com/Lumisia/Callog/commit/d5e491c8b771d461e257171b8d3c0b0cf858639c" },
+]
 architecture_image = "images/projects/callog/scheduler-architecture.svg"
-architecture_alt = "다중 Pod 환경에서 스케줄러가 같은 작업을 중복 실행할 수 있었습니다. 기능 전체 흐름"
+architecture_alt = "3. 이전 프로젝트 경험을 바탕으로 다중 Pod 스케줄러의 중복 실행을 예방했습니다. 기능 전체 아키텍처"
 cause = '''
 1. 이전 File in & Out 프로젝트에서 백엔드 Pod마다 스케줄러가 독립적으로 실행되는 문제를 경험했고, 같은 문제가 생기지 않도록 Callog 설계에 반영했습니다.
 2. 서버 내부 스케줄러는 다른 Pod의 작업 실행을 알 수 없고, 사용자 알림 연결도 각 Pod에 따로 존재했습니다.

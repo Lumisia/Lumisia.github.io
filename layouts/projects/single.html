@@ -172,7 +172,7 @@
       {{/*
         Project detail front matter:
         [[implementation_methods]] title, description, items = []
-        [[troubleshooting]] title, architecture_image, architecture_alt, cause, solution, result
+        [[troubleshooting]] title, kind, architecture_image, architecture_alt, cause, solution, result, evidence, evidence_note
       */}}
       {{- with .Params.implementation_methods }}
       <section class="proj-detail-section proj-implementation-section">
@@ -201,11 +201,13 @@
 
       {{- with .Params.troubleshooting }}
       <section id="troubleshooting" class="proj-detail-section proj-troubleshooting-section">
-        <h2 class="proj-sec-h">트러블 슈팅</h2>
+        <h2 class="proj-sec-h">문제 해결과 설계 판단</h2>
         <div class="troubleshooting-list">
           {{- range . }}
+          {{- $case := . }}
           <article class="troubleshooting-card">
             {{- with .title }}<h3 class="proj-detail-title">{{ . }}</h3>{{- end }}
+            {{- with .kind }}<p class="proj-detail-copy"><strong>{{ . }}</strong></p>{{- end }}
             <div class="troubleshooting-flow">
               {{- $architectureAlt := .architecture_alt | default "기능 전체 아키텍처" }}
               {{- with .architecture_image }}
@@ -220,20 +222,31 @@
               {{- end }}
               {{- with .cause }}
               <section class="troubleshooting-step">
-                <h4>문제 원인</h4>
+                <h4>{{ $case.cause_label | default "문제 원인" }}</h4>
                 <div>{{ $.RenderString . }}</div>
               </section>
               {{- end }}
               {{- with .solution }}
               <section class="troubleshooting-step troubleshooting-step--solution">
-                <h4>해결 과정</h4>
+                <h4>{{ $case.solution_label | default "해결 과정" }}</h4>
                 <div>{{ $.RenderString . }}</div>
               </section>
               {{- end }}
               {{- with .result }}
               <section class="troubleshooting-step troubleshooting-step--solution">
-                <h4>결과</h4>
+                <h4>{{ $case.result_label | default "결과" }}</h4>
                 <div>{{ $.RenderString . }}</div>
+              </section>
+              {{- end }}
+              {{- with .evidence }}
+              <section class="troubleshooting-step troubleshooting-step--evidence">
+                <h4>코드·검증 자료</h4>
+                <ul>
+                  {{- range . }}
+                  <li><a href="{{ .url }}" target="_blank" rel="noopener">{{ .label }}</a></li>
+                  {{- end }}
+                </ul>
+                {{- with $case.evidence_note }}<div>{{ $.RenderString . }}</div>{{- end }}
               </section>
               {{- end }}
             </div>

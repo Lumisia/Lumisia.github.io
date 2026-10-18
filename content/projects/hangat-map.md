@@ -93,9 +93,17 @@ items = [
 ]
 
 [[troubleshooting]]
-title = "1. 소셜 로그인에서 제공자 인증만으로는 기존 한갓 계정 연결을 허용할 수 없었습니다."
+title = "1. 소셜 계정 연결 전에 이메일 소유권을 확인하도록 설계했습니다."
+kind = "인증 설계 · 계정 연결"
+cause_label = "설계 배경"
+solution_label = "설계·구현"
+result_label = "적용 결과"
+evidence = [
+  { label = "이메일 코드 검증과 기존 계정 연결 판단", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/backend/src/main/java/com/example/hangat/user/service/OAuthOnboardingService.java#L219-L333" },
+  { label = "OAuth 완료 URL과 화면 상태 전달", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/backend/src/main/java/com/example/hangat/config/security/oauth/OAuthAuthenticationSuccessHandler.java#L129-L138" },
+]
 architecture_image = "images/projects/hangat-map/oauth-architecture.svg"
-architecture_alt = "1. 소셜 로그인에서 제공자 인증만으로는 기존 한갓 계정 연결을 허용할 수 없었습니다. 기능 전체 아키텍처"
+architecture_alt = "1. 소셜 계정 연결 전에 이메일 소유권을 확인하도록 설계했습니다. 기능 전체 아키텍처"
 cause = '''
 1. Google과 Kakao 로그인을 일반 회원 계정과 연결하는 흐름을 설계하면서, 당시 카카오 연동 환경에서는 이메일을 제공받지 못해 별도 입력과 인증이 필요했습니다.
 2. 입력한 이메일만으로 기존 한갓 계정의 소유권을 판단할 수 없고, 인증 전에 계정 정보를 안내하면 다른 사람의 가입 여부가 드러날 수 있었습니다.
@@ -122,9 +130,19 @@ result = '''
 '''
 
 [[troubleshooting]]
-title = "2. 비밀번호 찾기에서 임시 비밀번호 전달과 인증 로직의 중복을 피해야 했습니다."
+title = "2. 이메일 코드·일회용 티켓으로 비밀번호 재설정을 설계하고 검증 로직을 보완했습니다."
+kind = "설계·코드 검토 · 비밀번호 재설정"
+cause_label = "검토 배경"
+solution_label = "설계·보완"
+result_label = "적용 결과"
+evidence = [
+  { label = "코드 검증·실패 횟수 보존·티켓 발급", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/backend/src/main/java/com/example/hangat/user/service/PasswordResetCodeService.java#L49-L91" },
+  { label = "티켓 확인·비밀번호 변경·기존 토큰 폐기", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/backend/src/main/java/com/example/hangat/user/service/PasswordResetService.java" },
+  { label = "공통 인증 코드 해시 검증", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/backend/src/main/java/com/example/hangat/config/security/token/VerificationCodeHasher.java" },
+  { label = "검증 서비스 분리와 전용 예외 적용 변경 이력", url = "https://github.com/Lumisia/HanGat_Map/commit/5bdaabe06ee17a83a0b74e549e5fb436d0a6cf2f" },
+]
 architecture_image = "images/projects/hangat-map/reset-architecture.svg"
-architecture_alt = "2. 비밀번호 찾기에서 임시 비밀번호 전달과 인증 로직의 중복을 피해야 했습니다. 기능 전체 아키텍처"
+architecture_alt = "2. 이메일 코드·일회용 티켓으로 비밀번호 재설정을 설계하고 검증 로직을 보완했습니다. 기능 전체 아키텍처"
 cause = '''
 1. 기존 비밀번호 찾기 요구사항을 검토하면서, 임시 비밀번호를 메일로 받아 로그인한 뒤 다시 비밀번호를 변경해야 하는 흐름을 확인했습니다.
 2. 비밀번호 찾기와 마이페이지의 변경 로직을 따로 구현하고 소셜 가입과 계정 연결에서도 코드 처리를 각각 만들면, 유사한 검증이 중복되고 관리할 분기가 늘어날 수 있었습니다.
@@ -134,7 +152,7 @@ solution = '''
 - 메일로 로그인용 비밀번호를 전달하지 않도록, 같은 화면에서 6자리 코드 확인 후 일회용 티켓으로 새 비밀번호를 설정하는 흐름을 선택했습니다.
 - 비밀번호 찾기와 마이페이지가 동일한 발송, 검증, 재설정 API를 사용하게 해 별도의 비밀번호 변경 흐름을 중복 구현하지 않도록 했습니다.
 - 소셜 가입과 계정 연결에서도 공통 코드 생성기와 해시 검증기를 사용하고, 인증 목적과 요청 식별자를 해시에 포함하면서 검증 후 처리는 각 서비스에서 관리했습니다.
-- 코드와 티켓의 만료, 발송 횟수와 입력 실패 횟수를 제한하고, 검토 중 확인한 실패 횟수 롤백 문제는 잠금 조회와 `InvalidResetCodeException`의 롤백 제외로 보완했습니다.
+- 코드와 티켓의 만료, 발송 횟수와 입력 실패 횟수를 제한했습니다. 코드 검증에는 잠금 조회를 사용하고, 코드 불일치에도 실패 횟수가 보존되도록 롤백 제외 예외를 `InvalidResetCodeException`으로 한정했습니다.
 
 적용 정책: 코드 유효시간 10분, 입력 실패 최대 5회, 티켓 유효시간 5분, 코드 발송은 서버 프로세스별로 10분 동안 이메일별 3회와 IP별 10회 제한.
 
@@ -173,9 +191,19 @@ result = '''
 '''
 
 [[troubleshooting]]
-title = "3. 로그인 재발급에서 중복 요청과 토큰 만료 연장을 제어해야 했습니다."
+title = "3. Refresh Token의 회전·재사용·절대 만료 정책을 설계했습니다."
+kind = "설계·코드 검토 · 토큰 상태와 수명"
+cause_label = "검토 배경"
+solution_label = "설계·구현"
+result_label = "적용 결과와 제약"
+evidence_note = "연결한 통합 테스트는 데모 계정에서 토큰을 순차 재사용한 뒤 예외와 폐기 상태를 확인합니다. 동시 요청이나 트랜잭션 종료 후 별도 조회는 이 테스트의 검증 범위에 포함되지 않습니다."
+evidence = [
+  { label = "잠금·회전·재사용 감지·기존 만료 시각 유지", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/backend/src/main/java/com/example/hangat/user/service/AuthService.java#L153-L197" },
+  { label = "같은 프런트 실행 환경의 재발급 요청 공유", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/frontend/src/api/backendClient.js#L153-L175" },
+  { label = "데모 계정의 순차 토큰 재사용 통합 테스트", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/backend/src/test/java/com/example/hangat/user/DemoAccountIntegrationTest.java#L83-L93" },
+]
 architecture_image = "images/projects/hangat-map/refresh-architecture.svg"
-architecture_alt = "3. 로그인 재발급에서 중복 요청과 토큰 만료 연장을 제어해야 했습니다. 기능 전체 아키텍처"
+architecture_alt = "3. Refresh Token의 회전·재사용·절대 만료 정책을 설계했습니다. 기능 전체 아키텍처"
 cause = '''
 1. 로그인 재발급 흐름을 검토하면서, 같은 Refresh Token으로 요청이 겹치는 상황과 재사용 감지 후 처리, 재발급 시 만료 계산을 함께 확인했습니다.
 2. 잠금 없이 처리하면 하나의 토큰이 중복 회전할 수 있고, 재사용 감지 후 폐기가 예외로 취소되거나 새 발급 시점마다 만료일이 연장될 수 있었습니다.
