@@ -1,0 +1,28 @@
+{{- $names := dict "F" "File in & Out" "C" "Callog" "H" "한갓지도" -}}
+<div class="skill-groups">
+  {{- range site.Data.skills.groups }}
+  <section class="skill-group">
+    <h3 class="skill-group-title">{{ .label }}</h3>
+    <div class="skill-rows">
+      {{- range .rows }}
+      <div class="skill-row">
+        <p class="skill-row-label">{{ .label }}</p>
+        <div class="skill-row-items">
+          {{- range .items }}
+          {{- $used := slice }}
+          {{- range .used }}{{ $used = $used | append (index $names .) }}{{ end }}
+          <span class="stack" title="{{ delimit $used " · " }}에서 사용">
+            {{- if .icon }}<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/{{ .icon }}" alt="" loading="lazy" width="22" height="22">
+            {{- else if .img }}<img src="{{ .img }}" alt="" loading="lazy" width="22" height="22">
+            {{- else if .badge }}<span class="icon-badge {{ .badgeClass }}" aria-hidden="true">{{ .badge }}</span>
+            {{- end -}}
+            {{ .name }}
+          </span>
+          {{- end }}
+        </div>
+      </div>
+      {{- end }}
+    </div>
+  </section>
+  {{- end }}
+</div>

@@ -1,0 +1,133 @@
+# 기술 역량. 항목은 실제 리포지토리(FileinNOut / Callog / HanGat_Map)의
+# build.gradle · package.json · Dockerfile · Helm · Jenkinsfile · GitHub Actions를 확인해 정리했다.
+# used 값: F = File in & Out, C = Callog, H = 한갓지도
+
+[[groups]]
+id = "backend"
+label = "Backend"
+
+  [[groups.rows]]
+  label = "언어"
+  items = [
+    { name = "Java 17", icon = "java/java-original.svg", used = ["F", "C", "H"] },
+  ]
+
+  [[groups.rows]]
+  label = "프레임워크"
+  items = [
+    { name = "Spring Boot", icon = "spring/spring-original.svg", used = ["F", "C", "H"] },
+  ]
+
+  [[groups.rows]]
+  label = "라이브러리"
+  items = [
+    { name = "Spring Security", icon = "spring/spring-original.svg", used = ["F", "C", "H"] },
+    { name = "Spring Data JPA", icon = "spring/spring-original.svg", used = ["F", "C", "H"] },
+    { name = "OAuth2 Client", icon = "spring/spring-original.svg", used = ["F", "H"] },
+  ]
+
+  [[groups.rows]]
+  label = "데이터베이스"
+  items = [
+    { name = "MariaDB", icon = "mariadb/mariadb-original.svg", used = ["F", "C", "H"] },
+    { name = "Redis", icon = "redis/redis-original.svg", used = ["F", "C"] },
+    { name = "Valkey", badge = "VK", badgeClass = "ib-valkey", used = ["C"] },
+  ]
+
+  [[groups.rows]]
+  label = "스토리지"
+  items = [
+    { name = "MinIO", badge = "Mi", badgeClass = "ib-minio", used = ["F", "H"] },
+    { name = "AWS S3", icon = "amazonwebservices/amazonwebservices-plain-wordmark.svg", used = ["F", "C"] },
+  ]
+
+[[groups]]
+id = "frontend"
+label = "Frontend"
+
+  [[groups.rows]]
+  label = "언어"
+  items = [
+    { name = "JavaScript", icon = "javascript/javascript-original.svg", used = ["F", "C", "H"] },
+    { name = "TypeScript", icon = "typescript/typescript-original.svg", used = ["H"] },
+  ]
+
+  [[groups.rows]]
+  label = "프레임워크"
+  items = [
+    { name = "Vue 3", icon = "vuejs/vuejs-original.svg", used = ["F", "C", "H"] },
+  ]
+
+  [[groups.rows]]
+  label = "라이브러리"
+  items = [
+    { name = "Tailwind CSS", icon = "tailwindcss/tailwindcss-original.svg", used = ["F", "C"] },
+    { name = "Axios", icon = "axios/axios-plain.svg", used = ["F", "C"] },
+    { name = "Editor.js", badge = "Ed", badgeClass = "ib-editorjs", used = ["F", "C"] },
+    { name = "Yjs", badge = "Yj", badgeClass = "ib-yjs", used = ["F"] },
+    { name = "STOMP·SockJS", badge = "ST", badgeClass = "ib-stomp", used = ["F"] },
+  ]
+
+[[groups]]
+id = "devops"
+label = "DevOps"
+
+  [[groups.rows]]
+  label = "클라우드·서버"
+  items = [
+    { name = "OCI", icon = "oracle/oracle-original.svg", used = ["F", "H"] },
+    { name = "AWS (EC2·RDS·S3)", icon = "amazonwebservices/amazonwebservices-plain-wordmark.svg", used = ["F", "C"] },
+    { name = "Linux", icon = "linux/linux-original.svg", used = ["F", "C", "H"] },
+  ]
+
+  [[groups.rows]]
+  label = "컨테이너·오케스트레이션"
+  items = [
+    { name = "Docker", icon = "docker/docker-original.svg", used = ["F", "C", "H"] },
+    { name = "Kubernetes (k3s)", icon = "kubernetes/kubernetes-plain.svg", used = ["F", "C", "H"] },
+    { name = "Helm", icon = "helm/helm-original.svg", used = ["F", "H"] },
+    { name = "Argo Rollouts", badge = "Ar", badgeClass = "ib-argo", used = ["F"] },
+  ]
+
+  [[groups.rows]]
+  label = "웹 서버"
+  items = [
+    { name = "nginx", icon = "nginx/nginx-original.svg", used = ["F", "C", "H"] },
+  ]
+
+  [[groups.rows]]
+  label = "CI/CD·배포"
+  items = [
+    { name = "Jenkins", icon = "jenkins/jenkins-original.svg", used = ["F", "C", "H"] },
+    { name = "GitHub Actions", icon = "githubactions/githubactions-original.svg", used = ["F", "H"] },
+    { name = "Docker Hub", icon = "docker/docker-original.svg", used = ["F", "C", "H"] },
+  ]
+
+[[groups]]
+id = "tools"
+label = "측정·협업 도구"
+
+  [[groups.rows]]
+  label = "관측·모니터링"
+  items = [
+    { name = "Prometheus", icon = "prometheus/prometheus-original.svg", used = ["F", "C"] },
+    { name = "Grafana", icon = "grafana/grafana-original.svg", used = ["F"] },
+    { name = "Jaeger", icon = "jaegertracing/jaegertracing-original.svg", used = ["F", "C"] },
+    { name = "Kiali", badge = "Ki", badgeClass = "ib-kiali", used = ["F"] },
+    { name = "Istio", badge = "Is", badgeClass = "ib-istio", used = ["F"] },
+  ]
+
+  [[groups.rows]]
+  label = "테스트·부하"
+  items = [
+    { name = "JUnit 5", icon = "junit/junit-original.svg", used = ["F", "C", "H"] },
+    { name = "Vitest", icon = "vitest/vitest-original.svg", used = ["F", "H"] },
+    { name = "nGrinder", badge = "nG", badgeClass = "ib-ngrinder", used = ["F", "C"] },
+  ]
+
+  [[groups.rows]]
+  label = "형상관리·협업"
+  items = [
+    { name = "Git", icon = "git/git-original.svg", used = ["F", "C", "H"] },
+    { name = "GitHub", icon = "github/github-original.svg", used = ["F", "C", "H"] },
+  ]

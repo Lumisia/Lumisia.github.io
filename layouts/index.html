@@ -45,34 +45,9 @@
     </section>
 
     <section id="skills" data-screen-label="Skills">
-      <div class="sec-head"><h2 class="sec-title">Skills · 주로 다루는 기술 스택</h2></div>
+      <div class="sec-head"><h2 class="sec-title">기술 역량</h2></div>
       <div class="reveal">
-        <div class="stack-grid">
-          {{- $skills := slice
-            (dict "name" "Java"            "icon" "java/java-original.svg")
-            (dict "name" "JavaScript"      "icon" "javascript/javascript-original.svg")
-            (dict "name" "Vue.js"          "icon" "vuejs/vuejs-original.svg")
-            (dict "name" "Spring Boot"     "icon" "spring/spring-original.svg")
-            (dict "name" "Spring Data JPA" "icon" "spring/spring-original.svg")
-            (dict "name" "Kafka"           "icon" "apachekafka/apachekafka-original.svg")
-            (dict "name" "Redis"           "icon" "redis/redis-original.svg")
-            (dict "name" "Valkey"          "badge" "VK" "badgeClass" "ib-valkey")
-            (dict "name" "MariaDB"         "icon" "mariadb/mariadb-original.svg")
-            (dict "name" "Kubernetes"      "icon" "kubernetes/kubernetes-plain.svg")
-            (dict "name" "Docker"          "icon" "docker/docker-original.svg")
-            (dict "name" "AWS EC2"         "icon" "amazonwebservices/amazonwebservices-plain-wordmark.svg")
-            (dict "name" "nGrinder"        "badge" "nG" "badgeClass" "ib-ngrinder")
-            (dict "name" "Git"             "icon" "git/git-original.svg")
-          -}}
-          {{- range $skills }}
-          <span class="stack">
-            {{- if .icon }}<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/{{ .icon }}" alt="">
-            {{- else if .badge }}<span class="icon-badge {{ .badgeClass }}">{{ .badge }}</span>
-            {{- end -}}
-            {{ .name }}
-          </span>
-          {{- end }}
-        </div>
+        {{- partial "skills.html" . }}
       </div>
     </section>
 
