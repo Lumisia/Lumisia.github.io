@@ -1,0 +1,23 @@
+{{- $prefix := .linkPrefix -}}
+{{- $active := .activeSection -}}
+{{- $projects := where site.RegularPages "Section" "projects" -}}
+<header class="topnav" data-screen-label="Navigation">
+  <nav class="topnav-bar" aria-label="주요 메뉴">
+    <a class="topnav-link topnav-home{{ if eq $active "home" }} active{{ end }}" href="{{ $prefix }}#home" aria-label="홈">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+    </a>
+    <a class="topnav-link{{ if eq $active "skills" }} active{{ end }}" href="{{ $prefix }}#skills">SKILLS</a>
+    <div class="topnav-group" data-topnav-group>
+      <a class="topnav-link{{ if eq $active "projects" }} active{{ end }}" href="{{ $prefix }}#projects" aria-haspopup="true" aria-expanded="false" data-topnav-trigger>PROJECTS</a>
+      <ul class="topnav-menu" data-topnav-menu>
+        {{- range $projects.ByWeight }}
+        <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+        {{- end }}
+      </ul>
+    </div>
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="테마 바꾸기">
+      <svg class="theme-icon-light" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+      <svg class="theme-icon-dark" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+    </button>
+  </nav>
+</header>

@@ -1,6 +1,6 @@
 (() => {
   const shell = document.querySelector('.portfolio-shell');
-  const themeButtons = document.querySelectorAll('.theme-btn');
+  const themeToggle = document.querySelector('[data-theme-toggle]');
 
   const palettes = {
     '#a9cdec': {
@@ -19,57 +19,13 @@
 
   const accent = shell ? (shell.dataset.accent || '#a9cdec') : '#a9cdec';
   const canvasTone = shell ? (shell.dataset.canvasTone || 'pale') : 'pale';
-  const githubUser = shell ? shell.dataset.githubUser : null;
-
-  function bindImageFallback(img, fallbackId) {
-    const fallback = document.getElementById(fallbackId);
-    if (!img || !fallback) return;
-
-    const showImage = () => {
-      img.classList.remove('is-hidden');
-      fallback.hidden = true;
-    };
-    const showFallback = () => {
-      img.classList.add('is-hidden');
-      fallback.hidden = false;
-    };
-
-    img.onload = showImage;
-    img.onerror = showFallback;
-    if (img.complete) {
-      if (img.naturalWidth === 0) showFallback();
-      else showImage();
-      return;
-    }
-    showImage();
-  }
-
-  function updateGithub(set, theme, palette) {
-    if (!githubUser) return;
-    const hex = (color) => color.replace('#', '');
-    const ink = theme === 'dark' ? 'e6ecf3' : '2e3640';
-    const dim = theme === 'dark' ? '98a5b3' : '5b6674';
-    const graph = document.getElementById('gh-graph');
-    const stats = document.getElementById('gh-stats-img');
-    const streak = document.getElementById('gh-streak-img');
-
-    if (graph) {
-      graph.src = `https://ghchart.rshah.org/${hex(set.light.deep)}/${githubUser}`;
-    }
-    if (stats) {
-      bindImageFallback(stats, 'gh-stats-fallback');
-    }
-    if (streak) {
-      streak.src = `https://streak-stats.demolab.com?user=${githubUser}&hide_border=true&background=00000000&ring=${hex(palette.deep)}&fire=${hex(palette.deep)}&currStreakLabel=${hex(palette.deep)}&sideLabels=${ink}&currStreakNum=${ink}&sideNums=${ink}&dates=${dim}`;
-    }
-  }
 
   function applyTheme(theme) {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem('pf-theme', theme);
-    themeButtons.forEach((button) => {
-      button.classList.toggle('active', button.dataset.theme === theme);
-    });
+    if (themeToggle) {
+      themeToggle.setAttribute('title', theme === 'dark' ? '화이트 테마로 바꾸기' : '다크 테마로 바꾸기');
+    }
 
     const set = palettes[accent] || palettes['#a9cdec'];
     const palette = set[theme];
@@ -81,15 +37,14 @@
     style.setProperty('--blue-block', palette.block);
     style.setProperty('--card', palette.card);
     style.setProperty('--canvas', theme === 'light' && canvasTone === 'white' ? '#ffffff' : palette.canvas);
-    updateGithub(set, theme, palette);
   }
 
-  if (themeButtons.length) {
-    themeButtons.forEach((button) => {
-      button.addEventListener('click', () => applyTheme(button.dataset.theme));
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
     });
-    applyTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
   }
+  applyTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
 
   if (shell) {
     document.querySelectorAll('.stack img').forEach((img) => {
@@ -111,32 +66,55 @@
     document.querySelectorAll('.reveal').forEach((element) => element.classList.add('visible'));
   }
 
-  const sbToggle = document.querySelector('.sb-toggle');
-  if (sbToggle) {
-    // transform된 aside 밖으로 이동 — fixed 포지셔닝이 부모 transform에 영향받지 않도록
-    document.body.appendChild(sbToggle);
-    const SB_KEY = 'pf-sidebar-collapsed';
-    if (localStorage.getItem(SB_KEY) === '1') {
-      document.body.classList.add('sidebar-collapsed');
-    }
-    sbToggle.addEventListener('click', () => {
-      const collapsed = document.body.classList.toggle('sidebar-collapsed');
-      localStorage.setItem(SB_KEY, collapsed ? '1' : '0');
+  // Projects 하위 메뉴는 CSS가 hover/focus를 맡고, 여기서는 터치와 Escape만 처리한다.
+  const navGroup = document.querySelector('[data-topnav-group]');
+  if (navGroup) {
+    const trigger = navGroup.querySelector('[data-topnav-trigger]');
+    const setOpen = (open) => {
+      navGroup.classList.toggle('is-open', open);
+      trigger.setAttribute('aria-expanded', String(open));
+    };
+    navGroup.addEventListener('mouseenter', () => trigger.setAttribute('aria-expanded', 'true'));
+    navGroup.addEventListener('mouseleave', () => setOpen(false));
+    trigger.addEventListener('click', (event) => {
+      // 터치에서는 첫 탭으로 메뉴를 열고, 두 번째 탭에서 Projects 구역으로 이동한다.
+      if (!window.matchMedia('(hover: none)').matches) return;
+      if (!navGroup.classList.contains('is-open')) {
+        event.preventDefault();
+        setOpen(true);
+      }
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') setOpen(false);
+    });
+    document.addEventListener('click', (event) => {
+      if (!navGroup.contains(event.target)) setOpen(false);
     });
   }
 
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.sb-nav a');
+  const navLinks = [...document.querySelectorAll('.topnav-bar .topnav-link')];
+  const navIds = navLinks.map((link) => (link.getAttribute('href') || '').split('#')[1]).filter(Boolean);
+  // 내비에 있는 구역만 따진다. 그 아래 구역(GitHub·Experience…)을 보는 동안에는
+  // 바로 위 내비 항목이 선택된 채로 남는다.
+  const sections = [...document.querySelectorAll('section[id]')].filter((section) => navIds.includes(section.id));
   if (sections.length && navLinks.length) {
-    const navObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          navLinks.forEach((link) => {
-            link.classList.toggle('active', link.getAttribute('href') === `#${entry.target.id}`);
-          });
-        }
+    // 상단 바 바로 아래(120px)를 기준선으로 두고, 그 선을 지난 마지막 구역을 현재 위치로 본다.
+    const LINE = 120;
+    let last = '';
+    const sync = () => {
+      let current = sections[0];
+      sections.forEach((section) => {
+        if (section.getBoundingClientRect().top <= LINE) current = section;
       });
-    }, { threshold: 0.4 });
-    sections.forEach((section) => navObserver.observe(section));
+      if (current.id === last) return;
+      last = current.id;
+      navLinks.forEach((link) => {
+        const href = link.getAttribute('href') || '';
+        link.classList.toggle('active', href.endsWith(`#${current.id}`));
+      });
+    };
+    window.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+    sync();
   }
 })();
