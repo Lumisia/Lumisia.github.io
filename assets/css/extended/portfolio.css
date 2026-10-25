@@ -9,8 +9,8 @@
   --card: #ffffff;
   --ink: #2e3640;
   --ink-dim: #5b6674;
-  --sidebar-w: 300px;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-sans: "Paperlogy", "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, "Malgun Gothic", sans-serif;
  }
  html { scroll-behavior: smooth; }
 
@@ -32,10 +32,9 @@
  html[data-theme="dark"] .hero-photo { box-shadow: 0 0 0 1px var(--blue-hair), 0 12px 32px rgba(0,0,0,0.45); }
  html[data-theme="dark"] .stack img[src*="apachekafka"],
  html[data-theme="dark"] .stack img[src*="amazonwebservices"] { filter: invert(1) hue-rotate(180deg); }
- html[data-theme="dark"] .gh-graph { filter: invert(0.93) hue-rotate(180deg); }
 
 body {
-  font-family: "figmaSans", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", system-ui, "Malgun Gothic", sans-serif;
+  font-family: var(--font-sans);
   background: var(--canvas);
   color: var(--ink);
   line-height: 1.65;
