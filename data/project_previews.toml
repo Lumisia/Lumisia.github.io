@@ -1,0 +1,87 @@
+# 메인 소개 팝업용 요약. 상세 근거와 담당 화면은 content/projects에서 관리합니다.
+
+[fileinnout]
+period = "2026.01 ~ 2026.04"
+summary = "파일을 보관하고, 워크스페이스에서 문서를 함께 편집하는 협업 서비스"
+intro = "파일 보관과 실시간 문서 편집을 함께 제공하는 협업 서비스입니다."
+note = "팀 프로젝트 이후: 2026.06부터 개인 운영·고도화"
+tech = ["Java", "Spring Boot", "Spring Data JPA", "Vue 3", "Yjs", "Editor.js", "Redis", "OCI", "k3s", "Helm"]
+roles = [
+  { label = "워크스페이스", text = "화면·CRUD API·첨부파일·권한 구현" },
+  { label = "실시간 협업", text = "문서 동시 편집·초대·알림 구현" },
+  { label = "수료 후 개인 운영", text = "OCI 배포 구성·인증·SSE 개선" },
+]
+features = ["워크스페이스 생성·공유와 참여자별 권한 관리", "여러 사용자의 실시간 문서 편집과 첨부파일 처리", "초대·알림과 워크스페이스 버전 이력·복구"]
+validation = "구현 코드와 테스트 범위는 자세히 보기에서 확인할 수 있습니다."
+
+[[fileinnout.cases]]
+label = "동시 편집"
+summary = "동시 편집 누락 → 변경 블록만 동기화"
+result = "서로 다른 블록의 편집 보존을 통합 테스트로 확인"
+
+[[fileinnout.cases]]
+label = "목록 갱신"
+summary = "목록 반영 지연 → 필요한 데이터 조회·이벤트 갱신"
+result = "다음 폴링 대기 없이 변경 이벤트로 갱신"
+
+[[fileinnout.cases]]
+label = "SSE 연결"
+summary = "SSE 연결 충돌 → 공통 연결·ID별 정리"
+result = "중복 재연결·명시적 종료 후 재연결 차단 확인"
+
+[callog]
+period = "2026.04 ~ 2026.05"
+summary = "캠페인과 일정, 업무, KPI를 한곳에서 관리하는 협업 플랫폼"
+intro = "캠페인부터 일정·업무·성과 확인까지 연결하는 협업 플랫폼입니다."
+note = "데모는 서버 자원에 맞춰 일부 AI·자동화 기능을 중지한 상태입니다."
+tech = ["Java", "Spring Boot", "Spring Data JPA", "Vue 3", "MariaDB", "Redis", "Valkey", "ApexCharts", "nGrinder"]
+roles = [
+  { label = "캠페인·권한", text = "CRUD·초대·조직별 접근 권한 구현" },
+  { label = "대시보드·KPI", text = "집계 API·KPI 관리·성과 시각화" },
+  { label = "일정·성능 개선", text = "캘린더·팀보드·쿼리·캐시 개선" },
+]
+features = ["조직과 캠페인 권한에 맞춘 대시보드 조회", "캠페인·팀보드·일정 관리와 캘린더 연동", "조직·캠페인 KPI 연결과 기간별 성과 집계"]
+validation = "최대 100 VU·약 2분·동일 계정 반복 조회. 단계별 조건은 상세에서 확인할 수 있습니다."
+
+[[callog.cases]]
+label = "대시보드 조회"
+summary = "대시보드 조회 지연 → DB 집계·통합 응답 캐시"
+result = "11,033ms → 쿼리·Redis 995ms → Valkey 787ms"
+
+[[callog.cases]]
+label = "캘린더 표시"
+summary = "기간 일정 중복 → 주차별 막대·레인 배치"
+result = "중복 표시 개선·넘치는 일정은 +N으로 확인"
+
+[[callog.cases]]
+label = "스케줄러 실행"
+summary = "스케줄러 중복 위험 → 분산 락·Pub/Sub 적용"
+result = "락 유지 중 중복 진입 제어·서버 간 알림 전달"
+
+[hangat-map]
+period = "2026.08.24 ~ 2026.09.21"
+summary = "한적한 제주 여행지를 탐색하고 여행 코스를 계획하는 서비스"
+intro = "한적한 제주 여행지 탐색과 여행 코스 계획을 돕는 공모전 프로젝트입니다."
+tech = ["Java", "Spring Boot", "Spring Security", "OAuth 2.0", "Vue 3", "Jenkins", "Docker", "OCI", "k3s", "Helm"]
+roles = [
+  { label = "회원 인증", text = "일반·소셜 가입·이메일·계정 연결" },
+  { label = "마이페이지", text = "회원 API 연동·비밀번호 변경" },
+  { label = "배포·운영", text = "Jenkins 파이프라인·OCI 환경 구성" },
+]
+features = ["일반 회원가입과 Google·Kakao 소셜 로그인", "이메일 인증과 동의에 따른 기존 계정 연결", "비밀번호 재설정, 마이페이지와 로그인 토큰 관리"]
+validation = "재발급 요청 공유는 같은 프론트 실행 환경에 한정됩니다."
+
+[[hangat-map.cases]]
+label = "소셜 계정 연결"
+summary = "계정 연결 확인 필요 → 이메일 인증·동의 추가"
+result = "이메일 확인·연결 동의 후 계정 연결"
+
+[[hangat-map.cases]]
+label = "비밀번호 재설정"
+summary = "비밀번호 변경 중복 → 공통 검증·API 재사용"
+result = "비밀번호 찾기·마이페이지의 API 통합"
+
+[[hangat-map.cases]]
+label = "토큰 재발급"
+summary = "중복 토큰 재발급 → 잠금·회전·진행 요청 공유"
+result = "이전 토큰 재사용 제한·기존 만료 시각 유지"

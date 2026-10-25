@@ -1,2 +1,6 @@
 {{- $portfolio := resources.Get "js/portfolio.js" | minify | fingerprint -}}
 <script defer src="{{ $portfolio.RelPermalink }}" integrity="{{ $portfolio.Data.Integrity }}"></script>
+{{- if .IsHome }}
+{{- $previews := resources.Get "js/project-preview.js" | minify | fingerprint }}
+<script defer src="{{ $previews.RelPermalink }}" integrity="{{ $previews.Data.Integrity }}"></script>
+{{- end }}

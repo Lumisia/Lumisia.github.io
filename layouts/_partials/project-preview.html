@@ -1,0 +1,118 @@
+{{- $project := .project -}}
+{{- $preview := .preview -}}
+{{- $id := printf "project-%s" $project.Params.slug -}}
+{{- $gallery := slice -}}
+{{- range $project.Params.features -}}
+  {{- $feature := . -}}
+  {{- if .images -}}
+    {{- range .images -}}
+      {{- $alt := .alt | default $feature.heading -}}
+      {{- with resources.Get .image -}}
+        {{- $caption := $alt | replaceRE "^(Callog|한갓지도) " "" | replaceRE " 화면$" "" -}}
+        {{- $gallery = $gallery | append (dict "image" . "caption" $caption "alt" $alt) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- else -}}
+    {{- with .image -}}
+      {{- with resources.Get . -}}
+        {{- $gallery = $gallery | append (dict "image" . "caption" $feature.heading "alt" ($feature.image_alt | default $feature.heading)) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+<dialog class="project-preview" id="{{ $id }}" aria-labelledby="{{ $id }}-title">
+  <button class="preview-close" type="button" data-preview-close aria-label="프로젝트 소개 닫기" autofocus>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+  </button>
+  <div class="preview-summary" data-preview-summary>
+    <div class="preview-layout">
+      <div class="preview-sidebar">
+        <header class="preview-heading">
+          <p class="preview-meta">{{ $preview.period }} <span>{{ $project.Params.team }}</span></p>
+          <h2 id="{{ $id }}-title">{{ $project.Title }}</h2>
+        </header>
+        <div class="preview-roles">
+          <h3>내가 맡은 부분</h3>
+          <dl>
+            {{- range $preview.roles }}
+            <div><dt>{{ .label }}</dt><dd>{{ .text }}</dd></div>
+            {{- end }}
+          </dl>
+        </div>
+        <div class="preview-technologies">
+          <h3>사용 기술</h3>
+          <ul>{{ range $preview.tech }}<li>{{ . }}</li>{{ end }}</ul>
+        </div>
+        <div class="preview-links">
+          {{- with $project.Params.live_demo }}<a href="{{ . }}" target="_blank" rel="noopener noreferrer">라이브 데모 <span aria-hidden="true">↗</span></a>{{ end }}
+          {{- with $project.Params.repository }}<a href="{{ . }}" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>{{ end }}
+          <a class="preview-detail-link" href="{{ $project.RelPermalink }}">자세히 보기 <span aria-hidden="true">→</span></a>
+        </div>
+        {{- with $preview.note }}<p class="preview-note">{{ . }}</p>{{ end }}
+      </div>
+      <div class="preview-content">
+        {{- with resources.Get $project.Params.cover.image }}
+          {{- $cover := .Fit "1120x630 webp q85" }}
+          {{- $fit := $project.Params.cover.fit | default "contain" }}
+          {{- $pos := $project.Params.cover.position }}
+          {{- if $gallery }}
+        <button type="button" class="preview-cover" data-gallery-open aria-label="{{ $project.Title }} 담당 영역 화면 보기">
+          <img src="{{ $cover.RelPermalink }}" alt="{{ $project.Title }} 대표 이미지" width="{{ $cover.Width }}" height="{{ $cover.Height }}" loading="lazy" style="object-fit: {{ $fit }}{{ with $pos }}; object-position: {{ . }}{{ end }}">
+          <span class="preview-gallery-button"><span aria-hidden="true">▧</span> 담당 영역 <small>{{ len $gallery }}장</small></span>
+        </button>
+          {{- else }}
+        <div class="preview-cover"><img src="{{ $cover.RelPermalink }}" alt="{{ $project.Title }} 대표 이미지" width="{{ $cover.Width }}" height="{{ $cover.Height }}" loading="lazy" style="object-fit: {{ $fit }}{{ with $pos }}; object-position: {{ . }}{{ end }}"></div>
+          {{- end }}
+        {{- end }}
+        <p class="preview-intro">{{ $preview.intro }}</p>
+        <div class="preview-tabs" role="tablist" aria-label="{{ $project.Title }} 소개 항목">
+          {{- range $index, $label := slice "핵심 기능" "문제와 해결" "결과·검증" }}
+          <button type="button" role="tab" id="{{ $id }}-tab-{{ $index }}" aria-controls="{{ $id }}-panel-{{ $index }}" aria-selected="{{ if eq $index 0 }}true{{ else }}false{{ end }}" tabindex="{{ if eq $index 0 }}0{{ else }}-1{{ end }}">{{ $label }}</button>
+          {{- end }}
+        </div>
+        <div class="preview-panel" role="tabpanel" id="{{ $id }}-panel-0" aria-labelledby="{{ $id }}-tab-0" tabindex="0">
+          <ul class="preview-features">{{ range $preview.features }}<li>{{ . }}</li>{{ end }}</ul>
+        </div>
+        <div class="preview-panel" role="tabpanel" id="{{ $id }}-panel-1" aria-labelledby="{{ $id }}-tab-1" tabindex="0" hidden>
+          <ul class="preview-cases">
+            {{ range $preview.cases }}<li>{{ .summary }}</li>{{ end }}
+          </ul>
+        </div>
+        <div class="preview-panel" role="tabpanel" id="{{ $id }}-panel-2" aria-labelledby="{{ $id }}-tab-2" tabindex="0" hidden>
+          <ul class="preview-results">{{ range $preview.cases }}<li><strong>{{ .label }}</strong><span>{{ .result }}</span></li>{{ end }}</ul>
+          {{ with $preview.validation }}<p class="preview-validation">{{ . }}</p>{{ end }}
+        </div>
+      </div>
+    </div>
+  </div>
+  {{- with $gallery }}
+  <div class="preview-gallery" data-preview-gallery hidden>
+    <header class="preview-gallery-header">
+      <button type="button" class="preview-gallery-back" data-gallery-back>← 프로젝트 소개</button>
+      <h3 id="{{ $id }}-gallery-title">{{ $project.Title }} · 담당 영역</h3>
+      <p data-gallery-caption aria-live="polite" aria-atomic="true">{{ (index . 0).caption }}</p>
+    </header>
+    <div class="preview-gallery-stage">
+      <button class="preview-gallery-arrow preview-gallery-arrow--prev" type="button" data-gallery-prev aria-label="이전 담당 화면">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      {{- range $index, $slide := . }}
+      <figure data-gallery-slide data-caption="{{ $slide.caption }}"{{ if ne $index 0 }} hidden{{ end }}>
+        <img data-gallery-image data-src="{{ $slide.image.RelPermalink }}" alt="{{ $slide.alt }}">
+      </figure>
+      {{- end }}
+      <button class="preview-gallery-arrow preview-gallery-arrow--next" type="button" data-gallery-next aria-label="다음 담당 화면">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div class="preview-gallery-controls">
+      <div class="preview-gallery-picker" role="group" aria-label="담당 화면 선택">
+        {{- range $index, $slide := . }}
+        <button type="button" data-gallery-index="{{ $index }}" aria-label="{{ add $index 1 }}번 화면: {{ $slide.caption }}" title="{{ $slide.caption }}" aria-pressed="{{ if eq $index 0 }}true{{ else }}false{{ end }}"><span aria-hidden="true"></span></button>
+        {{- end }}
+      </div>
+    </div>
+  </div>
+  {{- end }}
+</dialog>

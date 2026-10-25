@@ -386,98 +386,24 @@ body > .main {
   font-size: 14px; font-weight: 480;
   transition: border-color 120ms ease;
  }
+ .skill-row-items .stack { gap: 8px; border-radius: 10px; padding: 5px 13px; font-size: 15px; line-height: 1.35; }
+ .skill-row-items .stack img, .skill-row-items .icon-badge { width: 18px; height: 18px; }
+ .skill-row-items .icon-badge { font-size: 8px; border-radius: 5px; }
  .stack:hover { border-color: var(--blue); }
  .stack img { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
- .skills-note { margin-top: 24px; font-size: 14.5px; font-weight: 330; color: var(--ink-dim); line-height: 1.8; }
- .skills-note b { font-weight: 540; color: var(--ink); }
 
- /* ── projects (타일 그리드 + 호버 오버레이) ── */
- .proj-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
-  align-items: stretch;
- }
- .proj-grid--1,
- .proj-grid--2 {
-  grid-template-columns: repeat(2, 1fr);
- }
- .proj-tile {
-  position: relative;
-  border: 1px solid var(--blue-hair); border-radius: 24px;
-  overflow: hidden; background: var(--card);
-  transition: border-color 120ms ease;
- }
- .proj-tile:hover { border-color: var(--blue); }
- .tile-img {
-  width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block;
-  background: var(--blue-soft);
- }
- .tile-img--contain {
-  object-fit: contain;
-  background: #f4f7fd;
- }
- .tile-overlay {
-  position: absolute; inset: 0; z-index: 2;
-  background: color-mix(in srgb, var(--blue-deep) 92%, transparent);
-  color: #fff;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 6px; text-align: center; padding: 18px 20px;
-  opacity: 0; transition: opacity 160ms ease;
-  pointer-events: none;
- }
- .proj-tile:hover .tile-overlay,
- .proj-tile:focus-within .tile-overlay { opacity: 1; }
- html[data-theme="dark"] .tile-overlay { color: #11161c; }
- .tile-cat {
-  font-family: var(--font-mono); font-size: 10.5px; font-weight: 500;
-  letter-spacing: 1.6px; text-transform: uppercase; opacity: 0.8;
- }
- .tile-title { font-size: 17px; font-weight: 700; letter-spacing: -0.2px; line-height: 1.25; }
- .tile-sum { font-size: 12.5px; font-weight: 330; line-height: 1.55; opacity: 0.88; }
- .tile-btn {
-  pointer-events: auto; cursor: pointer; margin-top: 10px;
-  font: inherit; font-size: 12.5px; font-weight: 480;
-  color: inherit; background: transparent;
-  border: 1px solid currentColor; border-radius: 50px;
-  padding: 6px 16px;
-  transition: opacity 120ms ease, transform 120ms ease;
- }
- .tile-btn:hover { opacity: 0.8; }
- .tile-btn:active { transform: scale(0.97); }
- /* 카드 하단 상시 노출 영역 — 오버레이는 hover에만 뜨므로 제목·수치는 항상 보이게 둔다 */
- .tile-always {
-  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
-  padding: 14px 12px 11px;
-  background: linear-gradient(to top, rgba(17,22,28,0.88), rgba(17,22,28,0.55) 62%, rgba(17,22,28,0));
-  pointer-events: none;
-  transition: opacity 160ms ease;
- }
- .proj-tile:hover .tile-always,
- .proj-tile:focus-within .tile-always { opacity: 0; }
- .tile-always-cat {
-  display: block;
-  font-family: var(--font-mono); font-size: 9.5px; font-weight: 500;
-  letter-spacing: 1.4px; text-transform: uppercase;
-  color: rgba(255,255,255,0.78);
- }
- .tile-always-title {
-  margin: 3px 0 8px;
-  font-size: 16px; font-weight: 700; letter-spacing: -0.2px; color: #fff;
- }
- .tile-metrics {
-  display: flex; gap: 8px; flex-wrap: wrap;
- }
- .tile-metric {
-  display: inline-flex; align-items: baseline; gap: 5px;
-  padding: 4px 10px; border-radius: 50px;
-  background: rgba(255,255,255,0.94);
-  box-shadow: 0 1px 4px rgba(17,22,28,0.18);
- }
- .tile-metric b {
-  font-size: 12px; font-weight: 700; color: var(--blue-deep); letter-spacing: -0.1px;
- }
- .tile-metric i {
-  font-style: normal; font-size: 10.5px; font-weight: 400; color: #5b6674;
- }
+/* ── 프로젝트 카드: 이미지 아래에서 제목·기간·소개를 읽는 구성 ── */
+.proj-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
+.proj-grid--1, .proj-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.project-card { display: flex; flex-direction: column; overflow: hidden; background: var(--card); border: 1px solid var(--blue-hair); border-radius: 22px; transition: border-color 150ms ease, box-shadow 150ms ease; }
+.project-card:hover { border-color: var(--blue-deep); box-shadow: 0 8px 24px rgba(30, 55, 80, .08); }
+.project-card-media { position: relative; flex-shrink: 0; aspect-ratio: 16 / 9; overflow: hidden; background: #fff; border-bottom: 1px solid var(--blue-hair); }
+.project-card-media img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
+.project-card-copy { padding: 20px 22px 24px; }
+.project-card-copy h3 { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 22px; font-weight: 700; letter-spacing: -.6px; line-height: 1.35; }
+.project-card-copy h3 span { color: var(--ink-dim); font-size: 18px; font-weight: 400; }
+.portfolio-shell .project-card-period { margin-top: 6px; color: var(--ink-dim); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.portfolio-shell .project-card-summary { margin-top: 13px; font-size: 15px; line-height: 1.65; word-break: keep-all; overflow-wrap: anywhere; }
 
 /* ── 프로젝트 상세 공통 ── */
  .modal { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 24px; }
@@ -1110,14 +1036,6 @@ h2.proj-sec-h {
 .feature-copy li:last-child { margin-bottom: 0; }
 .feature-copy p { margin: 0 0 10px; }
 .feature-copy p:last-child { margin-bottom: 0; }
-
-@media (hover: none) {
- .tile-overlay {
-   justify-content: flex-end;
-   opacity: 1;
-   background: linear-gradient(transparent 20%, color-mix(in srgb, var(--blue-deep) 92%, transparent));
- }
-}
 
 @media (max-width: 720px) {
  .resp-grid { grid-template-columns: 1fr; }

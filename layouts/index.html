@@ -87,26 +87,19 @@
       <div class="proj-grid{{ $gridMod }}">
         {{- range $projects.ByWeight }}
         {{- $project := . }}
-        <a class="proj-tile reveal" href="{{ .RelPermalink }}">
+        {{- $preview := index site.Data.project_previews .Params.slug }}
+        <a class="project-card" href="{{ .RelPermalink }}"{{ with $preview }} data-project-open="project-{{ $project.Params.slug }}"{{ end }}>
+          <div class="project-card-media">
           {{- with resources.Get .Params.cover.image }}
-          <img class="tile-img{{ if eq $project.Params.cover.fit "contain" }} tile-img--contain{{ end }}" src="{{ .RelPermalink }}" alt="{{ $project.Title }} 대표 이미지"{{ with $project.Params.cover.position }} style="object-position: {{ . }}"{{ end }}>
+          {{- $cover := .Fit "960x600 webp q85" }}
+          {{- $fit := $project.Params.cover.fit | default "contain" }}
+          <img src="{{ $cover.RelPermalink }}" alt="{{ $project.Title }} 대표 이미지" width="{{ $cover.Width }}" height="{{ $cover.Height }}" loading="lazy" style="object-fit: {{ $fit }}{{ with $project.Params.cover.position }}; object-position: {{ . }}{{ end }}">
           {{- end }}
-          <div class="tile-overlay">
-            <span class="tile-cat">{{ .Params.category }}</span>
-            <h3 class="tile-title">{{ .Title }}</h3>
-            <p class="tile-sum">{{ .Params.summary }}</p>
-            <span class="tile-btn">자세히 보기</span>
           </div>
-          <div class="tile-always">
-            <span class="tile-always-cat">{{ .Params.category }}</span>
-            <h3 class="tile-always-title">{{ .Title }}</h3>
-            {{- with .Params.highlights }}
-            <div class="tile-metrics">
-              {{- range . }}
-              <span class="tile-metric"><b>{{ .value }}</b><i>{{ .label }}</i></span>
-              {{- end }}
-            </div>
-            {{- end }}
+          <div class="project-card-copy">
+            <h3>{{ .Title }} <span aria-hidden="true">↗</span></h3>
+            <p class="project-card-period">{{ with $preview }}{{ .period }}{{ else }}{{ $project.Params.period }}{{ end }}</p>
+            <p class="project-card-summary">{{ with $preview }}{{ .summary }}{{ else }}{{ $project.Params.summary }}{{ end }}</p>
           </div>
         </a>
         {{- end }}
@@ -201,4 +194,10 @@
     <footer class="portfolio-footer">© {{ now.Year }} {{ site.Params.label.text }}</footer>
   </div>
 </div>
+{{- range where .Site.RegularPages "Section" "projects" }}
+  {{- $project := . }}
+  {{- with index site.Data.project_previews .Params.slug }}
+    {{- partial "project-preview.html" (dict "project" $project "preview" .) }}
+  {{- end }}
+{{- end }}
 {{ end }}
