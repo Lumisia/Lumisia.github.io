@@ -37,27 +37,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Generate GitHub metrics
+      - name: Fetch GitHub contributions
         if: ${{ env.METRICS_TOKEN != '' }}
-        uses: lowlighter/metrics@latest
-        with:
-          token: ${{ env.METRICS_TOKEN }}
-          user: Lumisia
-          filename: github-metrics.svg
-          output_action: none
-          template: classic
-          config_timezone: Asia/Seoul
-          config_display: regular
-          config_output: svg
-          base: header, activity, repositories
-      - name: Install generated GitHub metrics
-        if: ${{ env.METRICS_TOKEN != '' }}
-        run: |
-          mkdir -p assets/images/github
-          cp /metrics_renders/github-metrics.svg assets/images/github/github-metrics.svg
-      - name: Use bundled GitHub metrics placeholder
+        env:
+          GITHUB_LOGIN: Lumisia
+        run: python3 scripts/fetch_github_contributions.py || echo "::warning::contribution fetch failed; keeping the committed data file."
+      - name: Skip GitHub contributions refresh
         if: ${{ env.METRICS_TOKEN == '' }}
-        run: echo "::warning::METRICS_TOKEN is not set; using bundled placeholder metrics SVG."
+        run: echo "::warning::METRICS_TOKEN is not set; using the committed contribution data."
       - name: Fetch Tistory blog posts
         run: |
           python3 << 'EOF'
