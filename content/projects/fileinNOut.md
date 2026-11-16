@@ -13,7 +13,15 @@ repository = "https://github.com/Lumisia/FileinNOut"
 architecture_image = "images/projects/fileinnout/fileinnout.system_architecture.png"
 period = "2026.01 ~ 2026.04 (BEYOND SW 캠프 24기 3차 프로젝트)"
 team = "팀원 4명"
-responsibility = "웹소켓 및 백엔드 담당"
+responsibility = "웹소켓 및 백엔드 담당 (워크스페이스·권한 API)"
+
+# 시스템 아키텍처 Before / After 비교.
+# architecture_image = Before(팀 프로젝트 당시), architecture_after_image = After(수료 후 개인 운영).
+# After 이미지 파일을 아래 경로에 넣으면 비교 슬라이더가 켜지고, 없으면 Before 이미지만 표시됩니다.
+architecture_after_image = "images/projects/fileinnout/fileinnout.system_architecture.after.png"
+architecture_before_label = "Before · 팀 프로젝트 (AWS)"
+architecture_after_label = "After · 수료 후 개인 운영 (OCI k3s)"
+architecture_compare_note = "팀 프로젝트 당시에는 AWS 구성으로 배포했습니다. 수료 후 개인 운영으로 이어가면서 OCI k3s 환경을 새로 구축했으며, 기존 데이터를 옮기는 마이그레이션은 진행하지 않았습니다."
 
 [[highlights]]
 value = "수료 후 127 커밋"
@@ -83,7 +91,7 @@ icon  = "grafana"
 title = "Backend"
 items = [
   "워크스페이스 CRUD API 설계 및 구현",
-  "권한별 로직 검증",
+  "워크스페이스 권한(관리자·편집자·뷰어) 부여·검증 API와 공유 범위 처리",
   "워크스페이스 내부 에셋 저장 구조 설계",
   "워크스페이스 초대/반려 및 알림 구현 (SSE, STOMP WebSocket)",
 ]
@@ -231,11 +239,13 @@ assert.deepEqual(edA._arr, edB._arr, '수렴')
 [[troubleshooting]]
 title = "2. 워크스페이스 목록에서 불필요한 반복 조회와 변경 반영 지연이 발생했습니다."
 kind = "조회 구조·성능 개선 · 개인 운영"
-evidence_note = "개선 코드와 단위 테스트는 2026-10-18 확인한 미커밋 작업본입니다. 단위 테스트는 페이지 제한·매핑·Repository 호출을 확인하며, 측정 캡처의 당시 배포 버전과 작업본의 일치 여부는 별도로 확인해야 합니다."
+evidence_note = "단위 테스트는 페이지 제한·매핑·Repository 호출을 확인합니다. 성능 수치는 개인 운영 당시 nGrinder로 측정한 기록입니다."
 evidence = [
-  { label = "개선 전 공개된 목록 조회 코드", url = "https://github.com/Lumisia/FileinNOut/blob/b2861b4182c251729297744eaf6a53d444afcb9f/backend/src/main/java/com/example/WaffleBear/workspace/repository/UserPostRepository.java#L19-L30" },
-  { label = "Projection·페이지 처리 변경 발췌 · 로컬 미커밋 작업본", url = "/evidence/fileinnout/workspace-list-changes.txt" },
-  { label = "페이지 제한·매핑 단위 테스트 · 로컬 미커밋 작업본", url = "/evidence/fileinnout/workspace-list-test.txt" },
+  { label = "개선 전 목록 조회 코드", url = "https://github.com/Lumisia/FileinNOut/blob/b2861b4182c251729297744eaf6a53d444afcb9f/backend/src/main/java/com/example/WaffleBear/workspace/repository/UserPostRepository.java#L19-L30" },
+  { label = "Projection 목록 조회 쿼리", url = "https://github.com/Lumisia/FileinNOut/blob/209a5a1138aeea8a1d1559e49505286533b7e544/backend/src/main/java/com/example/WaffleBear/workspace/repository/UserPostRepository.java#L28-L41" },
+  { label = "페이지 제한·응답 매핑 코드", url = "https://github.com/Lumisia/FileinNOut/blob/209a5a1138aeea8a1d1559e49505286533b7e544/backend/src/main/java/com/example/WaffleBear/workspace/service/PostService.java#L462-L490" },
+  { label = "페이지 제한·매핑 단위 테스트", url = "https://github.com/Lumisia/FileinNOut/blob/209a5a1138aeea8a1d1559e49505286533b7e544/backend/src/test/java/com/example/WaffleBear/workspace/service/PostServiceWorkspaceListTest.java" },
+  { label = "Projection·페이지 처리 변경 이력", url = "https://github.com/Lumisia/FileinNOut/commit/209a5a1138aeea8a1d1559e49505286533b7e544" },
   { label = "개인 운영 측정 캡처 · 개선 전", url = "/images/projects/fileinnout/workspace-list-before.png" },
   { label = "개인 운영 측정 캡처 · 개선 후", url = "/images/projects/fileinnout/workspace-list-after.png" },
 ]
@@ -362,7 +372,7 @@ result = '''
 </div>
 
 <div class="proj-tech-group">
-<p class="proj-tech-cat">DevOps / Infra</p>
+<p class="proj-tech-cat">DevOps / Infra · 팀 프로젝트 당시</p>
 <div class="proj-tech-grid">
 <span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js 아이콘">Node.js</span>
 <span class="stack"><span class="icon-badge ib-ws">WS</span>WebSockets</span>
@@ -375,6 +385,20 @@ result = '''
 <span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mariadb/mariadb-original.svg" alt="MariaDB 아이콘">MariaDB</span>
 <span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg" alt="nginx 아이콘">nginx</span>
 <span class="stack"><span class="icon-badge ib-minio">Mi</span>MinIO</span>
+</div>
+</div>
+
+<div class="proj-tech-group">
+<p class="proj-tech-cat">DevOps / Infra · 수료 후 개인 운영</p>
+<div class="proj-tech-grid">
+<span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg" alt="Oracle Cloud 아이콘">OCI</span>
+<span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" alt="Kubernetes 아이콘">Kubernetes (k3s)</span>
+<span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/helm/helm-original.svg" alt="Helm 아이콘">Helm</span>
+<span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub Actions 아이콘">GitHub Actions</span>
+<span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" alt="Docker 아이콘">Docker</span>
+<span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prometheus/prometheus-original.svg" alt="Prometheus 아이콘">Prometheus</span>
+<span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/grafana/grafana-original.svg" alt="Grafana 아이콘">Grafana</span>
+<span class="stack"><span class="icon-badge">Ja</span>Jaeger</span>
 </div>
 </div>
 
