@@ -11,7 +11,10 @@ cover = { image = "images/projects/callog/callog.png", fit = "cover", position =
 live_demo = "https://magamcallog.kro.kr/"
 repository = "https://github.com/Lumisia/Callog"
 architecture_image = "images/projects/callog/callog-architecture.png"
-period = "2026.04 ~ 2026.05 (BEYOND SW 캠프 24기 최종 프로젝트)"
+architecture_after_image = "images/projects/callog/callog-architecture.after.png"
+architecture_before_label = "Before · 팀 프로젝트"
+architecture_after_label = "After · 개인 데모 운영 (OCI k3s)"
+period = "2026.04.08 ~ 2026.06.08 (BEYOND SW 캠프 24기 최종 프로젝트)"
 team = "팀원 5명"
 responsibility = "캠페인 · 대시보드 · 캘린더 · KPI · Redis 담당"
 
@@ -109,10 +112,11 @@ body = """
 [[troubleshooting]]
 title = "1. 대시보드에서 조회 지연으로 데이터가 표시되지 않거나 일부만 표시되는 문제가 있었습니다."
 kind = "문제 해결 · 초기 구현"
-evidence_note = "성능 기록은 동일 계정의 반복 조회 시나리오이며, 수동 확인 문서는 기능별 재현 절차입니다."
 evidence = [
   { label = "통합 응답 캐시 적용 코드", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/backend/app/src/main/java/org/example/backend/dashboard/service/DashboardAggregateService.java#L103-L129" },
   { label = "조건 조회·집계 호출 코드", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/backend/app/src/main/java/org/example/backend/dashboard/service/DashboardAggregateService.java#L134-L175" },
+  { label = "KPI 합계 GROUP BY 쿼리", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/backend/app/src/main/java/org/example/backend/kpi/repository/CampaignKpiContributionRepository.java#L40-L51" },
+  { label = "자산 분포 GROUP BY 쿼리", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/backend/app/src/main/java/org/example/backend/matching/repository/AssetRepository.java#L24-L35" },
   { label = "대시보드 수동 확인 절차", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/docs/callog-feature-test-guide.md#L45-L82" },
   { label = "쿼리 개선 변경 이력", url = "https://github.com/Lumisia/Callog/commit/82c0529f9f73986a9db0bf859bdda2326da90dc3" },
   { label = "측정 조건·Redis·Valkey 결과 기록 · 팀 위키", url = "https://github.com/beyond-sw-camp/be24-fin-magamFairy-callog/wiki/Redis-%ED%99%9C%EC%9A%A9-%EC%A0%84%EB%9E%B5" },
@@ -144,6 +148,62 @@ long countVisibleAssets(
         @Param("campaignIds") Collection<Long> campaignIds,
         @Param("ownerOrgId") Long ownerOrgId);
 ~~~
+
+**`GROUP BY` 집계로 바꾼 쿼리: 개선 전과 후**
+
+분기 목표를 계산할 때 조직 KPI 하나마다 약정 합계와 실적 합계를 따로 조회했습니다. 조직 KPI가 N개이면 합계 쿼리가 2N회 실행됐습니다.
+
+~~~java
+BigDecimal committed = contributionRepository.sumCommittedByTargetOrgKpi(k.getIdx());
+BigDecimal actual = contributionRepository.sumActualByTargetOrgKpi(k.getIdx());
+~~~
+
+조직 KPI ID를 `IN`으로 한 번에 넘기고 `GROUP BY`로 묶어, 두 합계를 쿼리 1회로 가져오도록 변경했습니다.
+
+~~~java
+@Query("SELECT c.targetOrgKpi.idx, " +
+       "       COALESCE(SUM(c.committedValue), 0), " +
+       "       COALESCE(SUM(c.actualValue), 0) " +
+       "FROM CampaignKpiContribution c " +
+       "WHERE c.targetOrgKpi.idx IN :orgKpiIds " +
+       "GROUP BY c.targetOrgKpi.idx")
+List<Object[]> sumByOrgKpiIdxIn(@Param("orgKpiIds") Collection<Long> orgKpiIds);
+~~~
+
+자산 분포는 전체 자산을 가져온 뒤 Java에서 조회 범위를 걸러 분류했습니다.
+
+~~~java
+return assetRepository.findAll().stream()
+        .filter(a -> {
+            if (scope.allCampaigns) return true;
+            Long camp = a.getCampaign() != null ? a.getCampaign().getIdx() : null;
+            Long org = a.getOrganization() != null ? a.getOrganization().getIdx() : null;
+            return (camp != null && visibleCampaignIds.contains(camp))
+                    || (scope.ownerOrgId != null && Objects.equals(scope.ownerOrgId, org));
+        })
+        .collect(Collectors.groupingBy(
+                a -> {
+                    String raw = a.getCategory();
+                    if (raw == null || raw.isBlank()) return "unknown";
+                    return raw.trim().toLowerCase();
+                },
+                Collectors.counting()));
+~~~
+
+조회 범위 조건과 카테고리별 개수를 DB에서 한 번에 계산하도록 옮겼습니다.
+
+~~~java
+@Query("SELECT LOWER(a.category), COUNT(a) FROM MarketingAsset a " +
+       "WHERE a.category IS NOT NULL " +
+       "  AND ((a.campaign.idx IN :campaignIds) " +
+       "       OR (:ownerOrgId IS NOT NULL AND a.organization.idx = :ownerOrgId)) " +
+       "GROUP BY LOWER(a.category)")
+List<Object[]> countCategoriesVisible(
+        @Param("campaignIds") Collection<Long> campaignIds,
+        @Param("ownerOrgId") Long ownerOrgId);
+~~~
+
+개선 전 코드는 쿼리 개선 변경 이력에서 삭제된 부분이며, 개선 후 쿼리는 현재 저장소의 코드입니다.
 
 **통합 API가 호출하는 메서드에 캐시 적용**
 

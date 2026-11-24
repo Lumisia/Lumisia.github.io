@@ -109,10 +109,42 @@
         {{ .Content }}
       </div>
 
+      {{/*
+        시스템 아키텍처.
+        architecture_image 만 있으면 이미지 한 장을 표시한다.
+        architecture_after_image 파일까지 있으면 Before / After 비교 슬라이더로 표시한다.
+        선택: architecture_before_label, architecture_after_label, architecture_compare_note
+      */}}
       {{- with resources.Get .Params.architecture_image }}
+      {{- $before := . }}
+      {{- $after := "" }}
+      {{- with $.Params.architecture_after_image }}{{- $after = resources.Get . }}{{- end }}
       <section class="project-arch">
         <h2 class="proj-sec-h">시스템 아키텍처</h2>
-        <img class="project-arch-img" src="{{ .RelPermalink }}" alt="{{ $.Title }} 시스템 아키텍처">
+        {{- if $after }}
+        {{- $beforeLabel := $.Params.architecture_before_label | default "Before" }}
+        {{- $afterLabel := $.Params.architecture_after_label | default "After" }}
+        <div class="arch-compare" data-arch-compare style="--arch-pos: 50%; aspect-ratio: {{ $before.Width }} / {{ $before.Height }};">
+          <img class="arch-compare-img" src="{{ $after.RelPermalink }}" alt="{{ $.Title }} 시스템 아키텍처 · {{ $afterLabel }}">
+          <div class="arch-compare-before">
+            <img class="arch-compare-img" src="{{ $before.RelPermalink }}" alt="{{ $.Title }} 시스템 아키텍처 · {{ $beforeLabel }}">
+          </div>
+          <span class="arch-compare-tag arch-compare-tag--before">{{ $beforeLabel }}</span>
+          <span class="arch-compare-tag arch-compare-tag--after">{{ $afterLabel }}</span>
+          <div class="arch-compare-divider" aria-hidden="true">
+            <span class="arch-compare-handle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6-6 6 6 6"/><path d="m15 6 6 6-6 6"/></svg>
+            </span>
+          </div>
+          <input class="arch-compare-range" type="range" min="0" max="100" value="50" step="1"
+            aria-label="시스템 아키텍처 Before와 After 비교 위치" data-arch-range>
+        </div>
+        {{- else }}
+        <img class="project-arch-img" src="{{ $before.RelPermalink }}" alt="{{ $.Title }} 시스템 아키텍처">
+        {{- end }}
+        {{- with $.Params.architecture_compare_note }}
+        <p class="arch-compare-note">{{ . | markdownify }}</p>
+        {{- end }}
       </section>
       {{- end }}
 

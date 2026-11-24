@@ -117,4 +117,21 @@
     window.addEventListener('resize', sync);
     sync();
   }
+
+  // 시스템 아키텍처 Before / After 비교 슬라이더.
+  // 위치(0~100)는 range 입력 하나가 갖고, CSS 변수 --arch-pos 로 화면에 반영한다.
+  document.querySelectorAll('[data-arch-compare]').forEach((compare) => {
+    const range = compare.querySelector('[data-arch-range]');
+    if (!range) return;
+
+    const apply = () => {
+      const pos = Number(range.value);
+      compare.style.setProperty('--arch-pos', `${pos}%`);
+      // 한쪽으로 거의 다 밀면 반대편 이름표를 숨긴다.
+      compare.dataset.archSide = pos >= 92 ? 'before' : pos <= 8 ? 'after' : 'both';
+    };
+
+    range.addEventListener('input', apply);
+    apply();
+  });
 })();
