@@ -109,7 +109,6 @@ body = """
 [[troubleshooting]]
 title = "1. 대시보드에서 조회 지연으로 데이터가 표시되지 않거나 일부만 표시되는 문제가 있었습니다."
 kind = "문제 해결 · 초기 구현"
-evidence_note = "성능 기록은 동일 계정의 반복 조회 시나리오이며, 수동 확인 문서는 기능별 재현 절차입니다."
 evidence = [
   { label = "통합 응답 캐시 적용 코드", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/backend/app/src/main/java/org/example/backend/dashboard/service/DashboardAggregateService.java#L103-L129" },
   { label = "조건 조회·집계 호출 코드", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/backend/app/src/main/java/org/example/backend/dashboard/service/DashboardAggregateService.java#L134-L175" },

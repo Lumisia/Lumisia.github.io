@@ -196,7 +196,6 @@ kind = "설계·코드 검토 · 토큰 상태와 수명"
 cause_label = "검토 배경"
 solution_label = "설계·구현"
 result_label = "적용 결과와 제약"
-evidence_note = "연결한 통합 테스트는 데모 계정에서 토큰을 순차 재사용한 뒤 예외와 폐기 상태를 확인합니다. 동시 요청이나 트랜잭션 종료 후 별도 조회는 이 테스트의 검증 범위에 포함되지 않습니다."
 evidence = [
   { label = "잠금·회전·재사용 감지·기존 만료 시각 유지", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/backend/src/main/java/com/example/hangat/user/service/AuthService.java#L153-L197" },
   { label = "같은 프런트 실행 환경의 재발급 요청 공유", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/frontend/src/api/backendClient.js#L153-L175" },

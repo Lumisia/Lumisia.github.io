@@ -153,7 +153,6 @@ body = """
 [[troubleshooting]]
 title = "1. 실시간 문서 편집 기능에서 변경 내용이 누락되고 문서 전체가 깜빡이는 문제가 있었습니다."
 kind = "문제 해결 · 기능 테스트"
-evidence_note = "두 Y.Doc과 가짜 에디터 사이의 편집 보존·수렴을 검사하는 통합 테스트입니다."
 evidence = [
   { label = "변경 블록 탐지 코드", url = "https://github.com/Lumisia/FileinNOut/blob/b2861b4182c251729297744eaf6a53d444afcb9f/frontend/src/components/workspace/collab/reconcile.js#L8-L42" },
   { label = "블록 공유 객체 갱신 코드", url = "https://github.com/Lumisia/FileinNOut/blob/b2861b4182c251729297744eaf6a53d444afcb9f/frontend/src/components/workspace/collab/yblocks.js#L30-L60" },
@@ -239,7 +238,6 @@ assert.deepEqual(edA._arr, edB._arr, '수렴')
 [[troubleshooting]]
 title = "2. 워크스페이스 목록에서 불필요한 반복 조회와 변경 반영 지연이 발생했습니다."
 kind = "조회 구조·성능 개선 · 개인 운영"
-evidence_note = "단위 테스트는 페이지 제한·매핑·Repository 호출을 확인합니다. 성능 수치는 개인 운영 당시 nGrinder로 측정한 기록입니다."
 evidence = [
   { label = "개선 전 목록 조회 코드", url = "https://github.com/Lumisia/FileinNOut/blob/b2861b4182c251729297744eaf6a53d444afcb9f/backend/src/main/java/com/example/WaffleBear/workspace/repository/UserPostRepository.java#L19-L30" },
   { label = "Projection 목록 조회 쿼리", url = "https://github.com/Lumisia/FileinNOut/blob/209a5a1138aeea8a1d1559e49505286533b7e544/backend/src/main/java/com/example/WaffleBear/workspace/repository/UserPostRepository.java#L28-L41" },
@@ -302,7 +300,6 @@ result = '''
 [[troubleshooting]]
 title = "3. 화면 진입 시 SSE 연결이 중복되어 끊김과 재연결이 반복됐습니다."
 kind = "문제 해결 · 운영 환경"
-evidence_note = "단위 테스트는 EventSource와 emitter의 대역으로 재연결 분기·연결 정리를 검사합니다."
 evidence = [
   { label = "재연결 판단과 공통 연결 관리", url = "https://github.com/Lumisia/FileinNOut/blob/b2861b4182c251729297744eaf6a53d444afcb9f/frontend/src/api/sseConnection.js#L31-L65" },
   { label = "연결 ID별 emitter 정리", url = "https://github.com/Lumisia/FileinNOut/blob/b2861b4182c251729297744eaf6a53d444afcb9f/backend/src/main/java/com/example/WaffleBear/config/sse/SseEmitterStore.java#L22-L36" },
