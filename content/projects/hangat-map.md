@@ -10,7 +10,7 @@ description = "한적한 제주 여행지를 탐색하고 여행 코스를 계�
 cover = { image = "images/projects/hangat-map/hangat-map.png", fit = "cover" }
 repository = "https://github.com/Lumisia/HanGat_Map"
 live_demo = "https://hangatjeju.com/"
-architecture_image = ""
+architecture_image = "images/projects/hangat-map/hangat-architecture.png"
 period = "2026.08.24 ~ 2026.09.21"
 team = "팀 프로젝트(4명)"
 responsibility = "회원 인증 및 보안 담당, 배포 파이프라인 및 운영 담당"
