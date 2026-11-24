@@ -139,11 +139,6 @@
           <input class="arch-compare-range" type="range" min="0" max="100" value="50" step="1"
             aria-label="시스템 아키텍처 Before와 After 비교 위치" data-arch-range>
         </div>
-        <div class="arch-compare-actions">
-          <button type="button" class="arch-compare-btn" data-arch-set="100">{{ $beforeLabel }}</button>
-          <button type="button" class="arch-compare-btn" data-arch-set="50">나란히</button>
-          <button type="button" class="arch-compare-btn" data-arch-set="0">{{ $afterLabel }}</button>
-        </div>
         {{- else }}
         <img class="project-arch-img" src="{{ $before.RelPermalink }}" alt="{{ $.Title }} 시스템 아키텍처">
         {{- end }}

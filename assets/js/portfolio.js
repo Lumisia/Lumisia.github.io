@@ -122,8 +122,6 @@
   // 위치(0~100)는 range 입력 하나가 갖고, CSS 변수 --arch-pos 로 화면에 반영한다.
   document.querySelectorAll('[data-arch-compare]').forEach((compare) => {
     const range = compare.querySelector('[data-arch-range]');
-    const actions = compare.nextElementSibling;
-    const buttons = actions ? [...actions.querySelectorAll('[data-arch-set]')] : [];
     if (!range) return;
 
     const apply = () => {
@@ -131,18 +129,9 @@
       compare.style.setProperty('--arch-pos', `${pos}%`);
       // 한쪽으로 거의 다 밀면 반대편 이름표를 숨긴다.
       compare.dataset.archSide = pos >= 92 ? 'before' : pos <= 8 ? 'after' : 'both';
-      buttons.forEach((button) => {
-        button.setAttribute('aria-pressed', String(Number(button.dataset.archSet) === pos));
-      });
     };
 
     range.addEventListener('input', apply);
-    buttons.forEach((button) => {
-      button.addEventListener('click', () => {
-        range.value = button.dataset.archSet;
-        apply();
-      });
-    });
     apply();
   });
 })();
