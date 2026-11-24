@@ -339,8 +339,11 @@ body > .main {
  .hero-competencies strong { font-weight: 700; }
  /* 역량 문장 아래에 붙는 작은 근거 줄 (어느 프로젝트의 경험인지) */
  .hero-comp-note {
-  display: block; margin-top: 2px;
+  display: block; margin-top: 2px; padding-left: 18px;
   font-size: 12.5px; line-height: 1.5; color: var(--ink-dim);
+ }
+ .hero-comp-note::before {
+  content: "→"; margin-right: 6px; color: var(--blue-deep); font-weight: 600;
  }
  .hero-comp-note a { color: var(--blue-deep); border-bottom: 1px solid var(--blue-hair); }
  .hero-cta { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; margin-top: 20px; }
