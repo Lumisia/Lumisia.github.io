@@ -46,7 +46,7 @@ items = [
   "**SSE 운영 안정화** — 프록시를 경유하는 실운영 HTTPS 환경으로 이전하며 새로 드러난 연결 끊김·재연결 반복을 단일 연결 통합 + 15초 heartbeat 구조로 해결 → 아래 트러블슈팅 3",
   "**OAuth 안정화** — 서브도메인 콜백 인증 실패를 상위 도메인 쿠키 공유로 해결, Tomcat RFC6265 쿠키 거부로 인한 500 오류 교정",
   "**보안·운영** — DB·MinIO 자격증명을 ConfigMap에서 Secret으로 분리하고 회전 시 재기동 checksum 적용, MinIO presigned URL 외부 HTTPS 서명",
-  "**인프라** — GitHub Actions 멀티아치(amd64+arm64) buildx 빌드, OCI ARM64 노드 k3s에 Helm 배포",
+  "**인프라** — Jenkins 파이프라인(GitHub push → 이미지 빌드 → Docker Hub → Helm 배포)으로 OCI ARM64 노드 k3s에 자동 배포",
   "**관측 스택 공개** — Prometheus·Grafana·Jaeger·Kiali 직접 구축, 위 모니터링 버튼에서 읽기 전용 실시간 확인",
   "**기능·품질** — 워크스페이스 버전 비교·복구, 파일 스트리밍 다운로드, 공개 데모 계정 + 저장 쿼터, SSE·OAuth·스토리지 회귀 테스트 작성",
 ]
@@ -391,7 +391,7 @@ result = '''
 <span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg" alt="Oracle Cloud 아이콘">OCI</span>
 <span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" alt="Kubernetes 아이콘">Kubernetes (k3s)</span>
 <span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/helm/helm-original.svg" alt="Helm 아이콘">Helm</span>
-<span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub Actions 아이콘">GitHub Actions</span>
+<span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jenkins/jenkins-original.svg" alt="Jenkins 아이콘">Jenkins</span>
 <span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" alt="Docker 아이콘">Docker</span>
 <span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prometheus/prometheus-original.svg" alt="Prometheus 아이콘">Prometheus</span>
 <span class="stack"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/grafana/grafana-original.svg" alt="Grafana 아이콘">Grafana</span>
