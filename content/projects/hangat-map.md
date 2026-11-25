@@ -102,7 +102,7 @@ evidence = [
   { label = "이메일 코드 검증과 기존 계정 연결 판단", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/backend/src/main/java/com/example/hangat/user/service/OAuthOnboardingService.java#L219-L333" },
   { label = "OAuth 완료 URL과 화면 상태 전달", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/backend/src/main/java/com/example/hangat/config/security/oauth/OAuthAuthenticationSuccessHandler.java#L129-L138" },
 ]
-architecture_image = "images/projects/hangat-map/oauth-architecture.svg"
+architecture_image = "images/projects/hangat-map/oauth-architecture.png"
 architecture_alt = "1. 소셜 계정 연결 전에 이메일 소유권을 확인하도록 설계했습니다. 기능 전체 아키텍처"
 cause = '''
 1. Google과 Kakao 로그인을 일반 회원 계정과 연결하는 흐름을 설계하면서, 당시 카카오 연동 환경에서는 이메일을 제공받지 못해 별도 입력과 인증이 필요했습니다.
@@ -141,7 +141,7 @@ evidence = [
   { label = "공통 인증 코드 해시 검증", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/backend/src/main/java/com/example/hangat/config/security/token/VerificationCodeHasher.java" },
   { label = "검증 서비스 분리와 전용 예외 적용 변경 이력", url = "https://github.com/Lumisia/HanGat_Map/commit/5bdaabe06ee17a83a0b74e549e5fb436d0a6cf2f" },
 ]
-architecture_image = "images/projects/hangat-map/reset-architecture.svg"
+architecture_image = "images/projects/hangat-map/reset-architecture.png"
 architecture_alt = "2. 이메일 코드·일회용 티켓으로 비밀번호 재설정을 설계하고 검증 로직을 보완했습니다. 기능 전체 아키텍처"
 cause = '''
 1. 기존 비밀번호 찾기 요구사항을 검토하면서, 임시 비밀번호를 메일로 받아 로그인한 뒤 다시 비밀번호를 변경해야 하는 흐름을 확인했습니다.
@@ -201,7 +201,7 @@ evidence = [
   { label = "같은 프런트 실행 환경의 재발급 요청 공유", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/frontend/src/api/backendClient.js#L153-L175" },
   { label = "데모 계정의 순차 토큰 재사용 통합 테스트", url = "https://github.com/Lumisia/HanGat_Map/blob/105675f74c1746480a2ed4cdd8f9cc38ff8a25ba/backend/src/test/java/com/example/hangat/user/DemoAccountIntegrationTest.java#L83-L93" },
 ]
-architecture_image = "images/projects/hangat-map/refresh-architecture.svg"
+architecture_image = "images/projects/hangat-map/refresh-architecture.png"
 architecture_alt = "3. Refresh Token의 회전·재사용·절대 만료 정책을 설계했습니다. 기능 전체 아키텍처"
 cause = '''
 1. 로그인 재발급 흐름을 검토하면서, 같은 Refresh Token으로 요청이 겹치는 상황과 재사용 감지 후 처리, 재발급 시 만료 계산을 함께 확인했습니다.
