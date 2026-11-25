@@ -121,7 +121,7 @@ evidence = [
   { label = "쿼리 개선 변경 이력", url = "https://github.com/Lumisia/Callog/commit/82c0529f9f73986a9db0bf859bdda2326da90dc3" },
   { label = "측정 조건·Redis·Valkey 결과 기록 · 팀 위키", url = "https://github.com/beyond-sw-camp/be24-fin-magamFairy-callog/wiki/Redis-%ED%99%9C%EC%9A%A9-%EC%A0%84%EB%9E%B5" },
 ]
-architecture_image = "images/projects/callog/dashboard-architecture.svg"
+architecture_image = "images/projects/callog/dashboard-architecture.png"
 architecture_alt = "대시보드에서 조회 지연으로 데이터가 표시되지 않거나 일부만 표시되는 문제가 있었습니다. 기능 전체 흐름"
 cause = '''
 1. 기능을 기초 구현한 뒤 대시보드에 진입했을 때 데이터가 표시되지 않거나 일부 영역만 표시되는 현상을 발견했습니다.
@@ -252,7 +252,7 @@ evidence = [
   { label = "기간 일정 표시 개선 변경 이력", url = "https://github.com/Lumisia/Callog/commit/004ae2e69b037af6f00a7e1eac96879caeaf70f5" },
   { label = "캘린더 수동 확인 절차", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/docs/callog-feature-test-guide.md#L264-L300" },
 ]
-architecture_image = "images/projects/callog/calendar-architecture.svg"
+architecture_image = "images/projects/callog/calendar-architecture.png"
 architecture_alt = "캘린더에서 기간 일정이 반복 표시되고 다른 일정을 가리는 문제가 있었습니다. 기능 전체 흐름"
 cause = '''
 1. 여러 임시 더미 일정을 넣어 확인하면서, 기간 일정이 반복 표시되고 다른 1일 또는 3일 일정이 보이지 않는 현상을 발견했습니다.
@@ -298,7 +298,7 @@ evidence = [
   { label = "Pod 간 SSE 이벤트 발행", url = "https://github.com/Lumisia/Callog/blob/fe768cb6742e7df684f4a3fb8a2444ee16e59fb2/backend/app/src/main/java/org/example/backend/notification/service/NotificationSseService.java#L107-L126" },
   { label = "분산 락·알림 중계 도입 변경 이력", url = "https://github.com/Lumisia/Callog/commit/d5e491c8b771d461e257171b8d3c0b0cf858639c" },
 ]
-architecture_image = "images/projects/callog/scheduler-architecture.svg"
+architecture_image = "images/projects/callog/scheduler-architecture.png"
 architecture_alt = "3. 이전 프로젝트 경험을 바탕으로 다중 Pod 스케줄러의 중복 실행을 예방했습니다. 기능 전체 아키텍처"
 cause = '''
 1. 이전 File in & Out 프로젝트에서 백엔드 Pod마다 스케줄러가 독립적으로 실행되는 문제를 경험했고, 같은 문제가 생기지 않도록 Callog 설계에 반영했습니다.

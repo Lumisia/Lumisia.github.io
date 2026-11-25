@@ -159,7 +159,7 @@ evidence = [
   { label = "Editor.js 부분 갱신 코드", url = "https://github.com/Lumisia/FileinNOut/blob/b2861b4182c251729297744eaf6a53d444afcb9f/frontend/src/components/workspace/collab/editorBinding.js#L24-L41" },
   { label = "서로 다른 블록의 동시 편집 통합 테스트", url = "https://github.com/Lumisia/FileinNOut/blob/b2861b4182c251729297744eaf6a53d444afcb9f/frontend/src/components/workspace/collab/binding.integration.test.js#L39-L75" },
 ]
-architecture_image = "images/projects/fileinnout/editor-architecture.svg"
+architecture_image = "images/projects/fileinnout/editor-architecture.png"
 architecture_alt = "실시간 문서 편집 기능에서 변경 내용이 누락되고 문서 전체가 깜빡이는 문제가 있었습니다. 기능 전체 흐름"
 cause = '''
 1. 다른 사람과 기능 테스트를 할 때 문서의 변경 내용이 제대로 반영되지 못한 현상을 발견했고, 직접 두 브라우저로 추가 확인하면서 문서 전체가 깜빡이는 현상도 확인했습니다.
@@ -247,7 +247,7 @@ evidence = [
   { label = "개인 운영 측정 캡처 · 개선 전", url = "/images/projects/fileinnout/workspace-list-before.png" },
   { label = "개인 운영 측정 캡처 · 개선 후", url = "/images/projects/fileinnout/workspace-list-after.png" },
 ]
-architecture_image = "images/projects/fileinnout/workspace-list-architecture.svg"
+architecture_image = "images/projects/fileinnout/workspace-list-architecture.png"
 architecture_alt = "워크스페이스 목록에서 불필요한 반복 조회와 변경 반영 지연이 발생했습니다. 기능 전체 흐름"
 cause = '''
 1. 처음에는 워크스페이스 목록을 30초마다 다시 조회했는데, 목록에 변경이 없는 사용자도 같은 요청을 반복한다는 문제를 확인했습니다.
@@ -306,7 +306,7 @@ evidence = [
   { label = "재연결·명시적 종료 단위 테스트", url = "https://github.com/Lumisia/FileinNOut/blob/b2861b4182c251729297744eaf6a53d444afcb9f/frontend/src/api/sseConnection.test.js" },
   { label = "heartbeat와 끊긴 연결 정리 단위 테스트", url = "https://github.com/Lumisia/FileinNOut/blob/b2861b4182c251729297744eaf6a53d444afcb9f/backend/src/test/java/com/example/WaffleBear/config/sse/SseHeartbeatTest.java" },
 ]
-architecture_image = "images/projects/fileinnout/sse-architecture.svg"
+architecture_image = "images/projects/fileinnout/sse-architecture.png"
 architecture_alt = "화면 진입 시 SSE 연결이 중복되어 끊김과 재연결이 반복됐습니다. 기능 전체 흐름"
 cause = '''
 1. 화면에 들어갈 때 알림과 워크스페이스에서 SSE 연결을 각각 열어, 연결이 끊겼다가 다시 연결되는 동작이 반복되는 것을 확인했습니다.
