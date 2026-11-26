@@ -1,6 +1,6 @@
 +++
 title = "AI-handoff"
-draft = true
+draft = false
 date = 2026-06-19
 weight = 4
 slug = "ai-handoff"
