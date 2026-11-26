@@ -400,7 +400,17 @@ body > .main {
  .stack img { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
 
 /* ── 프로젝트 카드: 이미지 아래에서 제목·기간·소개를 읽는 구성 ── */
+/* 프로젝트 분류 탭: 팝업의 preview-tabs와 같은 모양, 제목 오른쪽 같은 줄에 두고 선택 밑줄이 제목 아래 선에 닿게 함 */
+.sec-head--tabs { display: flex; align-items: flex-end; gap: 28px; border-bottom: 1px solid var(--blue-hair); }
+.sec-head--tabs .sec-title { border-bottom: 0; }
+.project-tabs { display: flex; gap: 22px; }
+.project-tabs button { position: relative; padding: 0 0 14px; border: 0; background: transparent; color: var(--ink-dim); font-size: 15px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.project-tabs button:hover { color: var(--ink); }
+.project-tabs button[aria-selected="true"] { color: var(--blue-deep); }
+.project-tabs button[aria-selected="true"]::after { content: ""; position: absolute; bottom: -1px; left: 0; right: 0; height: 3px; border-radius: 2px; background: var(--blue-deep); }
+.project-tabs button:focus-visible { outline: 2px solid var(--blue-deep); outline-offset: 3px; border-radius: 4px; }
 .proj-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
+.proj-grid[hidden] { display: none; }
 .proj-grid--1, .proj-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .project-card { display: flex; flex-direction: column; overflow: hidden; background: var(--card); border: 1px solid var(--blue-hair); border-radius: 22px; transition: border-color 150ms ease, box-shadow 150ms ease; }
 .project-card:hover { border-color: var(--blue-deep); box-shadow: 0 8px 24px rgba(30, 55, 80, .08); }

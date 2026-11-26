@@ -1,0 +1,16 @@
+{{- $project := . -}}
+{{- $preview := index site.Data.project_previews $project.Params.slug -}}
+<a class="project-card" href="{{ $project.RelPermalink }}"{{ with $preview }} data-project-open="project-{{ $project.Params.slug }}"{{ end }}>
+  <div class="project-card-media">
+  {{- with resources.Get $project.Params.cover.image }}
+  {{- $cover := .Fit "960x600 webp q85" }}
+  {{- $fit := $project.Params.cover.fit | default "contain" }}
+  <img src="{{ $cover.RelPermalink }}" alt="{{ $project.Title }} 대표 이미지" width="{{ $cover.Width }}" height="{{ $cover.Height }}" loading="lazy" style="object-fit: {{ $fit }}{{ with $project.Params.cover.position }}; object-position: {{ . }}{{ end }}">
+  {{- end }}
+  </div>
+  <div class="project-card-copy">
+    <h3>{{ $project.Title }} <span aria-hidden="true">↗</span></h3>
+    <p class="project-card-period">{{ with $preview }}{{ .period }}{{ else }}{{ $project.Params.period }}{{ end }}</p>
+    <p class="project-card-summary">{{ with $preview }}{{ .summary }}{{ else }}{{ $project.Params.summary }}{{ end }}</p>
+  </div>
+</a>

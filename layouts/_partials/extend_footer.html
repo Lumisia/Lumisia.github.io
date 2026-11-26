@@ -3,6 +3,8 @@
 {{- if .IsHome }}
 {{- $previews := resources.Get "js/project-preview.js" | minify | fingerprint }}
 <script defer src="{{ $previews.RelPermalink }}" integrity="{{ $previews.Data.Integrity }}"></script>
+{{- $projectTabs := resources.Get "js/project-tabs.js" | minify | fingerprint }}
+<script defer src="{{ $projectTabs.RelPermalink }}" integrity="{{ $projectTabs.Data.Integrity }}"></script>
 {{- $ghContrib := resources.Get "js/github-contrib.js" | minify | fingerprint }}
 <script defer src="{{ $ghContrib.RelPermalink }}" integrity="{{ $ghContrib.Data.Integrity }}"></script>
 {{- end }}
