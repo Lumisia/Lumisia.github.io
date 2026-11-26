@@ -85,3 +85,42 @@ result = "비밀번호 찾기·마이페이지의 API 통합"
 label = "토큰 재발급"
 summary = "중복 토큰 재발급 → 잠금·회전·진행 요청 공유"
 result = "이전 토큰 재사용 제한·기존 만료 시각 유지"
+
+[ai-handoff]
+period = "2026.06.19 ~ 진행 중"
+summary = "Claude Code와 Codex 사이에서 작업 목표와 진행 상황을 로컬 캡슐로 넘겨주는 인계 도구"
+intro = "Claude Code와 Codex 사이에서 작업 상태를 캡슐로 넘겨 이어서 작업하게 하는 개인 개발 도구입니다."
+note = "설계는 직접 했고, 구현은 AI(Claude Code · Codex)로 진행했습니다."
+tech = ["Rust", "clap", "serde", "Ratatui", "Tauri 2", "React 18", "TypeScript", "GitHub Actions", "NSIS"]
+roles = [
+  { label = "설계", text = "훅·IPC·데몬 구조와 캡슐 저장 방식 설계" },
+  { label = "동작 규칙", text = "캡슐 인계·재질문 방지 규칙 결정" },
+  { label = "검증·릴리스", text = "실사용 검수·단계별 커밋·3 OS 배포" },
+]
+features = ["사용량 한도 전에 캡슐을 저장하고 다른 에이전트로 작업 인계", "5시간 사용량 기준 체크포인트 질문(네 / 아니오 / 기타)", "TUI·GUI 캡슐 관리와 설치·훅·IPC 진단"]
+validation = "근거 코드·테스트·커밋 링크는 자세히 보기에서 확인할 수 있습니다."
+
+[[ai-handoff.cases]]
+label = "Rust 전환"
+summary = "Node 훅 EPERM → Rust 훅·샌드박스 밖 데몬"
+result = "EPERM 없이 캡슐 저장·v2.0.1에서 v1 대체"
+
+[[ai-handoff.cases]]
+label = "반복 질문"
+summary = "같은 세션 재질문 → 한도 구간 단위로 질문 상태 저장"
+result = "네·아니오·기타 모두 초기화 전 재질문 없음"
+
+[[ai-handoff.cases]]
+label = "스킬 중복"
+summary = "Codex 스킬 2개씩 표시 → 옛 묶음을 검색 범위 밖에 보관"
+result = "스킬마다 하나로 복구·고친 내용 보존"
+
+[[ai-handoff.cases]]
+label = "훅 중복"
+summary = "재설치마다 훅 증가 → 실행 명령으로 소유권 판정"
+result = "표시가 지워진 설정에서도 복사본 증가 없음"
+
+[[ai-handoff.cases]]
+label = "샌드박스 권한"
+summary = "샌드박스 훅 IPC 실패 → 권한 상속·샌드박스 밖 데몬 기동"
+result = "Codex 데스크톱 훅이 데몬을 호출해 캡슐 저장"
