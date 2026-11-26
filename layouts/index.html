@@ -54,33 +54,35 @@
     </section>
 
     <section id="projects" data-screen-label="Projects">
-      <div class="sec-head">
+      {{- /* 분류 탭: 프로젝트 front matter의 project_group (기본 Backend). 프로젝트가 있는 분류가 2개 이상일 때만 제목 옆에 탭을 표시한다. */}}
+      {{- $projects := (where .Site.RegularPages "Section" "projects").ByWeight }}
+      {{- $groups := slice }}
+      {{- range slice "Backend" "AI" }}
+        {{- $name := . }}
+        {{- $items := slice }}
+        {{- range $projects }}{{ if eq (.Params.project_group | default "Backend") $name }}{{ $items = $items | append . }}{{ end }}{{ end }}
+        {{- if $items }}{{ $groups = $groups | append (dict "name" $name "items" $items) }}{{ end }}
+      {{- end }}
+      <div class="sec-head{{ if gt (len $groups) 1 }} sec-head--tabs{{ end }}">
         <h2 class="sec-title">Projects</h2>
-      </div>
-      {{- $projects := where .Site.RegularPages "Section" "projects" }}
-      {{- $pcount := len $projects }}
-      {{- $gridMod := "" }}
-      {{- if eq $pcount 1 }}{{- $gridMod = " proj-grid--1" }}{{- else if eq $pcount 2 }}{{- $gridMod = " proj-grid--2" }}{{- end }}
-      <div class="proj-grid{{ $gridMod }}">
-        {{- range $projects.ByWeight }}
-        {{- $project := . }}
-        {{- $preview := index site.Data.project_previews .Params.slug }}
-        <a class="project-card" href="{{ .RelPermalink }}"{{ with $preview }} data-project-open="project-{{ $project.Params.slug }}"{{ end }}>
-          <div class="project-card-media">
-          {{- with resources.Get .Params.cover.image }}
-          {{- $cover := .Fit "960x600 webp q85" }}
-          {{- $fit := $project.Params.cover.fit | default "contain" }}
-          <img src="{{ $cover.RelPermalink }}" alt="{{ $project.Title }} 대표 이미지" width="{{ $cover.Width }}" height="{{ $cover.Height }}" loading="lazy" style="object-fit: {{ $fit }}{{ with $project.Params.cover.position }}; object-position: {{ . }}{{ end }}">
+        {{- if gt (len $groups) 1 }}
+        <div class="project-tabs" role="tablist" aria-label="프로젝트 분류" data-project-tabs>
+          {{- range $i, $g := $groups }}
+          <button type="button" role="tab" id="project-tab-{{ lower $g.name }}" aria-controls="project-panel-{{ lower $g.name }}" aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}" tabindex="{{ if eq $i 0 }}0{{ else }}-1{{ end }}">{{ $g.name }}</button>
           {{- end }}
-          </div>
-          <div class="project-card-copy">
-            <h3>{{ .Title }} <span aria-hidden="true">↗</span></h3>
-            <p class="project-card-period">{{ with $preview }}{{ .period }}{{ else }}{{ $project.Params.period }}{{ end }}</p>
-            <p class="project-card-summary">{{ with $preview }}{{ .summary }}{{ else }}{{ $project.Params.summary }}{{ end }}</p>
-          </div>
-        </a>
+        </div>
         {{- end }}
       </div>
+      {{- range $i, $g := $groups }}
+      {{- $count := len $g.items }}
+      {{- $gridMod := "" }}
+      {{- if eq $count 1 }}{{- $gridMod = " proj-grid--1" }}{{- else if eq $count 2 }}{{- $gridMod = " proj-grid--2" }}{{- end }}
+      <div class="proj-grid{{ $gridMod }}"{{ if gt (len $groups) 1 }} role="tabpanel" id="project-panel-{{ lower $g.name }}" aria-labelledby="project-tab-{{ lower $g.name }}"{{ if ne $i 0 }} hidden{{ end }}{{ end }}>
+        {{- range $g.items }}
+        {{ partial "project-card.html" . }}
+        {{- end }}
+      </div>
+      {{- end }}
     </section>
 
     <section id="github" data-screen-label="GitHub">
