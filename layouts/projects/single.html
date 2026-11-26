@@ -12,6 +12,9 @@
       <header class="project-header">
         <p class="pd-cat">{{ .Params.category }}</p>
         <h1 class="pd-title">{{ .Title }}</h1>
+        {{- with .Params.notice }}
+        <p class="project-notice">{{ . | markdownify }}</p>
+        {{- end }}
         <p class="pd-sum">{{ .Params.description }}</p>
       </header>
 
@@ -29,7 +32,7 @@
           {{- with .Params.live_demo }}
           <a class="pill pill-primary" href="{{ . }}" target="_blank" rel="noopener">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-            Live Demo
+            {{ $.Params.live_demo_label | default "Live Demo" }}
           </a>
           {{- end }}
           {{- with .Params.repository }}
@@ -150,11 +153,37 @@
 
       {{- with .Params.contributions }}
       <section class="proj-resp-section">
-        <h2 class="proj-sec-h">내가 기여한 부분</h2>
+        <h2 class="proj-sec-h">{{ $.Params.contributions_title | default "내가 기여한 부분" }}</h2>
         <div class="resp-grid">
           {{- range . }}
-          <article class="resp-card{{ if eq .title "DevOps/Infra" }} resp-card--full{{ end }}">
+          <article class="resp-card{{ if or (eq .title "DevOps/Infra") .full }} resp-card--full{{ end }}">
             <h3 class="resp-card-title">{{ .title }}</h3>
+            <ul class="proj-points">
+              {{- range .items }}
+              <li>{{ . }}</li>
+              {{- end }}
+            </ul>
+          </article>
+          {{- end }}
+        </div>
+      </section>
+      {{- end }}
+
+      {{/*
+        AI 활용 방법 (선택).
+        [[ai_usage]] title, logo(이미지 URL), items = [], full = true(한 줄 전체)
+        선택: ai_usage_title, ai_usage_intro
+      */}}
+      {{- with .Params.ai_usage }}
+      <section class="proj-resp-section proj-ai-usage">
+        <h2 class="proj-sec-h">{{ $.Params.ai_usage_title | default "AI 활용 방법" }}</h2>
+        {{- with $.Params.ai_usage_intro }}
+        <p class="advancement-note">{{ . | markdownify }}</p>
+        {{- end }}
+        <div class="resp-grid">
+          {{- range . }}
+          <article class="resp-card{{ if .full }} resp-card--full{{ end }}">
+            <h3 class="resp-card-title">{{ with .logo }}<img class="resp-card-logo" src="{{ . }}" alt="" aria-hidden="true">{{ end }}{{ .title }}</h3>
             <ul class="proj-points">
               {{- range .items }}
               <li>{{ . }}</li>
@@ -204,7 +233,7 @@
       {{/*
         Project detail front matter:
         [[implementation_methods]] title, description, items = []
-        [[troubleshooting]] title, kind, architecture_image, architecture_alt, cause, solution, result, evidence, evidence_note
+        [[troubleshooting]] title, kind, architecture_image, architecture_alt, architecture_label, cause, solution, followup_image(+_alt, _label), followup(+followup_label), followup_solution(+followup_solution_label), result, evidence, evidence_note
       */}}
       {{- with .Params.implementation_methods }}
       <section class="proj-detail-section proj-implementation-section">
@@ -245,7 +274,7 @@
               {{- with .architecture_image }}
               {{- with resources.Get . }}
               <section class="troubleshooting-step troubleshooting-step--architecture">
-                <h4>전체 아키텍처</h4>
+                <h4>{{ $case.architecture_label | default "전체 아키텍처" }}</h4>
                 <a href="{{ .RelPermalink }}" target="_blank" rel="noopener" aria-label="{{ $architectureAlt }} 크게 보기">
                   <img src="{{ .RelPermalink }}" alt="{{ $architectureAlt }}" loading="lazy">
                 </a>
@@ -261,6 +290,29 @@
               {{- with .solution }}
               <section class="troubleshooting-step troubleshooting-step--solution">
                 <h4>{{ $case.solution_label | default "해결 과정" }}</h4>
+                <div>{{ $.RenderString . }}</div>
+              </section>
+              {{- end }}
+              {{- with .followup_image }}
+              {{- with resources.Get . }}
+              {{- $followupAlt := $case.followup_image_alt | default "이어서 생긴 문제 구조" }}
+              <section class="troubleshooting-step troubleshooting-step--architecture">
+                <h4>{{ $case.followup_image_label | default "문제 상황" }}</h4>
+                <a href="{{ .RelPermalink }}" target="_blank" rel="noopener" aria-label="{{ $followupAlt }} 크게 보기">
+                  <img src="{{ .RelPermalink }}" alt="{{ $followupAlt }}" loading="lazy">
+                </a>
+              </section>
+              {{- end }}
+              {{- end }}
+              {{- with .followup }}
+              <section class="troubleshooting-step">
+                <h4>{{ $case.followup_label | default "이어서 생긴 문제" }}</h4>
+                <div>{{ $.RenderString . }}</div>
+              </section>
+              {{- end }}
+              {{- with .followup_solution }}
+              <section class="troubleshooting-step troubleshooting-step--solution">
+                <h4>{{ $case.followup_solution_label | default "해결 과정" }}</h4>
                 <div>{{ $.RenderString . }}</div>
               </section>
               {{- end }}

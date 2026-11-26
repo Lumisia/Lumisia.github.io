@@ -31,7 +31,9 @@
  html[data-theme="dark"] .cta-block .pill-ghost:hover { background: rgba(255,255,255,0.16); }
  html[data-theme="dark"] .hero-photo { box-shadow: 0 0 0 1px var(--blue-hair), 0 12px 32px rgba(0,0,0,0.45); }
  html[data-theme="dark"] .stack img[src*="apachekafka"],
- html[data-theme="dark"] .stack img[src*="amazonwebservices"] { filter: invert(1) hue-rotate(180deg); }
+ html[data-theme="dark"] .stack img[src*="amazonwebservices"],
+ html[data-theme="dark"] .stack img[src*="ratatui"],
+ html[data-theme="dark"] .resp-card-logo[src*="openai"] { filter: invert(1) hue-rotate(180deg); }
 
 body {
   font-family: var(--font-sans);
@@ -924,6 +926,26 @@ h2.proj-sec-h {
 .resp-card--full {
  grid-column: 1 / -1;
 }
+.proj-ai-usage .resp-card-title {
+ display: flex;
+ align-items: center;
+ gap: 8px;
+}
+.resp-card-logo {
+ display: block;
+ flex-shrink: 0;
+ width: 18px;
+ height: 18px;
+ margin: 0;
+ object-fit: contain;
+}
+.project-notice {
+ margin: 8px 0 0;
+ font-size: 1.08rem;
+ font-weight: 700;
+ line-height: 1.5;
+ color: var(--ink);
+}
 .resp-card-title {
  font-size: 13px;
  font-weight: 700;
@@ -1021,8 +1043,8 @@ h2.proj-sec-h {
 }
 .troubleshooting-step img {
  display: block;
- width: 100%;
- max-width: 760px;
+ width: auto;
+ max-width: min(100%, 760px);
  height: auto;
  border-radius: 10px;
  border: 1px solid var(--blue-hair);

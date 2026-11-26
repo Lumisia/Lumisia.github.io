@@ -45,7 +45,7 @@
           <ul>{{ range $preview.tech }}<li>{{ . }}</li>{{ end }}</ul>
         </div>
         <div class="preview-links">
-          {{- with $project.Params.live_demo }}<a href="{{ . }}" target="_blank" rel="noopener noreferrer">라이브 데모 <span aria-hidden="true">↗</span></a>{{ end }}
+          {{- with $project.Params.live_demo }}<a href="{{ . }}" target="_blank" rel="noopener noreferrer">{{ $project.Params.live_demo_label | default "라이브 데모" }} <span aria-hidden="true">↗</span></a>{{ end }}
           {{- with $project.Params.repository }}<a href="{{ . }}" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>{{ end }}
           <a class="preview-detail-link" href="{{ $project.RelPermalink }}">자세히 보기 <span aria-hidden="true">→</span></a>
         </div>
