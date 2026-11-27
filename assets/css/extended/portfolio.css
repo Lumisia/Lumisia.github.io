@@ -547,7 +547,11 @@ body > .main {
   padding-left: 16px; position: relative;
  }
  .tl-points li::before { content: "•"; position: absolute; left: 0; color: var(--blue); }
- .tl-points b { font-weight: 540; color: var(--ink); }
+ .tl-points b, .tl-points strong { font-weight: 540; color: var(--ink); }
+ .tl-title, .tl-sub, .tl-points li { word-break: keep-all; overflow-wrap: anywhere; }
+ .tl-title a { color: inherit; text-decoration: none; }
+ .tl-title a::after { content: " ↗"; font-size: 13px; font-weight: 500; color: var(--blue-deep); }
+ .tl-title a:hover { color: var(--blue-deep); text-decoration: underline; text-underline-offset: 3px; }
 
  /* ── 자격증 ── */
  .cert-list { margin-top: 28px; border-top: 1px solid var(--blue-hair); }
