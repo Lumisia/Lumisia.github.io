@@ -1,5 +1,5 @@
 (() => {
-  // Backend / AI project tabs on the home page. Without JavaScript the first panel stays visible.
+  // ALL / Backend / AI project tabs on the home page. Without JavaScript the first panel stays visible.
   const list = document.querySelector('[data-project-tabs]');
   if (!list) return;
   const tabs = [...list.querySelectorAll('[role="tab"]')];
